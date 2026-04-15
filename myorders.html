@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - Bakeit</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #fff7f8;
+        }
+
+        header {
+            background: white;
+            padding: 15px 40px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            height: 40px;
+        }
+
+        .logo span {
+            font-size: 24px;
+            color: #ff5c7a;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+        }
+
+        .order {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .item {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .status {
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        .delivery {
+            color: green;
+            margin-top: 5px;
+        }
+
+        .btn {
+            margin-top: 10px;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .cancel {
+            background: orange;
+            color: white;
+        }
+
+        .delete {
+            background: red;
+            color: white;
+        }
+
+        .empty {
+            text-align: center;
+            margin-top: 100px;
+            color: #888;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            <a href="index.html"><img src="images/logo.png"></a>
+            <span>Bakeit</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2 style="text-align:center;margin-bottom:20px;">My Orders</h2>
+        <div id="orderList"></div>
+    </div>
+
+    <script>
+        // GET USER
+        let user = JSON.parse(localStorage.getItem("user"));
+        if (!user) {
+            window.location.href = "login.html";
+        }
+
+        // GET ORDERS
+        let orders = JSON.parse(localStorage.getItem("orders")) || [];
+        let list = document.getElementById("orderList");
+
+        // MAP WITH ORIGINAL INDEX (VERY IMPORTANT)
+        let userOrders = orders
+            .map((o, i) => ({ ...o, originalIndex: i }))
+            .filter(o => o.email === user.email);
+
+        // SHOW ORDERS
+        if (userOrders.length === 0) {
+            list.innerHTML = `<div class="empty">No orders yet 🧁</div>`;
+        } else {
+
+            userOrders.forEach(o => {
+
+                let itemsHTML = "";
+
+                o.items.forEach(item => {
+                    itemsHTML += `
+        <div class="item">
+          ${item.name} x ${item.qty} - Rs.${item.price * item.qty}
+        </div>
+      `;
+                });
+
+                let status = o.status || "Pending";
+
+                list.innerHTML += `
+      <div class="order">
+
+        <h3>${o.name}</h3>
+
+        ${itemsHTML}
+
+        <p><strong>Total:</strong> Rs.${o.total}</p>
+
+        <div class="status">Status: ${status}</div>
+
+        <div class="delivery">
+          🚚 Delivery Date: ${o.delivery || "Not set yet"}
+        </div>
+
+        ${(status !== "Delivered" && status !== "Cancelled")
+                        ? `<button class="btn cancel" onclick="cancelOrder(${o.originalIndex})">
+              Cancel Order
+            </button>`
+                        : ""
+                    }
+
+        ${(status === "Delivered")
+                        ? `<button class="btn delete" onclick="deleteOrder(${o.originalIndex})">
+              Delete Record
+            </button>`
+                        : ""
+                    }
+
+      </div>
+    `;
+            });
+        }
+
+        // CANCEL ORDER + NOTIFY ADMIN
+        function cancelOrder(index) {
+            if (!confirm("Cancel this order?")) return;
+
+            let orders = JSON.parse(localStorage.getItem("orders")) || [];
+            let notifications = JSON.parse(localStorage.getItem("notifications")) || [];
+
+            orders[index].status = "Cancelled";
+
+            // 🔔 NOTIFICATION
+            notifications.push({
+                message: "Order cancelled by " + orders[index].name,
+                time: new Date().toLocaleString()
+            });
+
+            localStorage.setItem("orders", JSON.stringify(orders));
+            localStorage.setItem("notifications", JSON.stringify(notifications));
+
+            alert("Order cancelled successfully!");
+            location.reload();
+        }
+
+        // DELETE AFTER DELIVERY
+        function deleteOrder(index) {
+            if (!confirm("Delete this record?")) return;
+
+            let orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+            if (orders[index].status === "Delivered") {
+                orders.splice(index, 1);
+            }
+
+            localStorage.setItem("orders", JSON.stringify(orders));
+
+            location.reload();
+        }
+    </script>
+
+</body>
+
+</html>

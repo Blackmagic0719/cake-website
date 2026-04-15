@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bakeit Cake Shop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: #fff7f8;
+      overflow-x: hidden;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      /* Pushes logo left and header-right right */
+      align-items: center;
+      padding: 15px 40px;
+      background: white;
+      flex-wrap: wrap;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      /* Adds space between Login, Sign Up, and Cart */
+    }
+
+    /* Optional: Clean up the cart icon style to match your image */
+    .cart-icon {
+      font-size: 24px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .cart-icon span {
+      position: absolute;
+      top: -5px;
+      right: -10px;
+      background: #ff5c7a;
+      color: white;
+      font-size: 12px;
+      padding: 2px 6px;
+      border-radius: 50%;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo img {
+      height: 45px;
+    }
+
+    .logo span {
+      font-size: 26px;
+      font-weight: 600;
+      color: #ff5c7a;
+    }
+
+    nav a {
+      margin: 0 15px;
+      text-decoration: none;
+      color: #555;
+    }
+
+    .btn1 {
+      background: #ff5c7a;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+    }
+
+    /* HERO SECTION */
+    .hero {
+      position: relative;
+      height: 351px;
+      /* keep your height */
+      width: 100%;
+      /* full width */
+      overflow: hidden;
+    }
+
+    .hero img {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+
+    /* overlay */
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      top: 0;
+      left: 0;
+      z-index: 2;
+    }
+
+    .hero {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .hero-text {
+      position: relative;
+      z-index: 3;
+      color: white;
+      text-align: center;
+      max-width: 600px;
+    }
+
+    .hero-text h1 {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+
+    .hero-text p {
+      margin-bottom: 20px;
+    }
+
+    .section {
+      padding: 60px 40px;
+      text-align: center;
+    }
+
+    .cakes {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .cake {
+      background: white;
+      padding: 15px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .cake img {
+      width: 100%;
+      border-radius: 10px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: #ff5c7a;
+      color: white;
+    }
+
+    /* MOBILE */
+    @media (max-width:768px) {
+      .hero-text h1 {
+        font-size: 28px;
+      }
+    }
+
+    .see-more {
+      text-align: center;
+      margin: 40px 0 80px;
+    }
+
+    .see-more .btn {
+      padding: 12px 30px;
+      font-size: 16px;
+      border-radius: 30px;
+    }
+
+    .cart-icon {
+      position: relative;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .cart-icon span {
+      position: absolute;
+      top: -8px;
+      right: -10px;
+      background: #ff5c7a;
+      color: white;
+      font-size: 12px;
+      padding: 2px 6px;
+      border-radius: 50%;
+    }
+
+    .cart-box {
+      position: fixed;
+      right: -300px;
+      top: 0;
+      width: 300px;
+      height: 100%;
+      background: white;
+      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      transition: 0.3s;
+      z-index: 999;
+    }
+
+    .cart-box.active {
+      right: 0;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      width: 300px;
+    }
+
+    .modal input {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+    }
+
+    .btn {
+      background: white;
+      /* white button */
+      color: #ff5c7a;
+      /* pink text */
+      padding: 10px 20px;
+      border: 2px solid #ff5c7a;
+      /* pink border */
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn:hover {
+      background: #ff5c7a;
+      color: white;
+    }
+
+    footer img:hover {
+      transform: scale(1.1);
+      transition: 0.3s;
+    }
+
+    @media (max-width: 768px) {
+
+      header {
+        flex-direction: row !important;
+        /* keep row */
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+      }
+
+      .logo {
+        flex: 1;
+      }
+
+      .header-right {
+        display: flex;
+        gap: 10px;
+        flex: 1;
+        justify-content: flex-end;
+      }
+
+      /* Buttons smaller for mobile */
+      .btn {
+        padding: 8px 14px;
+        font-size: 13px;
+      }
+
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo">
+      <img src="images/logo.png" alt="logo">
+      <span>Bakeit</span>
+    </div>
+
+    <div class="header-right" id="authArea"></div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+
+    <img src="images/main2.png" alt="cake">
+
+    <div class="hero-text">
+      <h1>Delicious Cake<br>For Everyone</h1>
+      <p>Freshly baked cakes made with love ❤️</p>
+      <button class="btn1" onclick="openAbout()">About Us</button>
+    </div>
+    <div id="loginBox" class="modal">
+      <div class="modal-content">
+        <h2>Login</h2>
+        <input type="text" id="loginUser" placeholder="Username">
+        <input type="password" id="loginPass" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <span onclick="closeModal()">Close</span>
+      </div>
+    </div>
+
+    <div id="signupBox" class="modal">
+      <div class="modal-content">
+        <h2>Sign Up</h2>
+        <input type="text" id="signupUser" placeholder="Username">
+        <input type="password" id="signupPass" placeholder="Password">
+        <button onclick="signup()">Sign Up</button>
+        <span onclick="closeModal()">Close</span>
+      </div>
+    </div>
+
+
+  </section>
+  <div id="overlay" style="
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.5);
+  z-index:999;
+"></div>
+  <div id="aboutBox" style="
+  display:none;
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:white;
+  padding:30px;
+  border-radius:15px;
+  width:90%;
+  max-width:500px;
+  box-shadow:0 10px 40px rgba(0,0,0,0.3);
+  z-index:1000;
+  text-align:center;
+">
+
+    <h2>About Bakeit 🍰</h2>
+
+    <p style="margin-top:15px;color:#555;">
+      Welcome to Bakeit — your favorite place for fresh and delicious cakes.
+      We bake with love and use high-quality ingredients to make every celebration special ❤️
+    </p>
+
+    <button onclick="closeAbout()" style="
+    margin-top:20px;
+    padding:10px 20px;
+    border:none;
+    background:#ff5c7a;
+    color:white;
+    border-radius:20px;
+    cursor:pointer;
+  ">
+      Close
+    </button>
+
+  </div>
+
+  <div id="loginPopup" style="
+  display:none;
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:white;
+  padding:25px;
+  border-radius:15px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);
+  text-align:center;
+  z-index:1000;
+">
+
+    <h3>Please login first 🔐</h3>
+
+    <button onclick="goLogin()" style="
+    margin-top:15px;
+    padding:10px 20px;
+    border:none;
+    background:#ff5c7a;
+    color:white;
+    border-radius:20px;
+    cursor:pointer;
+  ">
+      Go to Login
+    </button>
+
+    <br><br>
+
+    <button onclick="closePopup()" style="
+    border:none;
+    background:#ddd;
+    padding:8px 15px;
+    border-radius:10px;
+    cursor:pointer;
+  ">
+      Close
+    </button>
+
+  </div>
+  <div id="overlay" style="
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.5);
+  z-index:999;
+"></div>
+
+  <!-- MENU -->
+  <section class="section" id="menu">
+    <h2>Our Exclusive Cakes</h2>
+
+    <div class="cakes">
+
+      <div class="cake">
+        <img src="images/cake3.jpeg">
+        <h3>Chocolate Cake</h3>
+      </div>
+
+      <div class="cake">
+        <img src="images/cake2.jpeg">
+        <h3>Black Forest</h3>
+      </div>
+
+      <div class="cake">
+        <img src="images/cake.jpeg">
+        <h3>Strawberry Cake</h3>
+      </div>
+
+    </div>
+  </section>
+  <div class="see-more">
+    <button class="btn" onclick="goProducts()">See More Cakes</button>
+  </div>
+  <div id="contactBox" style="
+  display:none;
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:white;
+  padding:25px;
+  border-radius:15px;
+  text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);
+  z-index:1000;
+">
+
+    <h3>Contact Info</h3>
+
+    <p style="margin-top:10px;">📧 [bakeit@gmail.com]</p>
+
+    <p>
+      <a href="https://wa.me/94769207762" target="_blank" style="color:#25D366;">
+        💬 WhatsApp
+      </a>
+    </p>
+
+    <button onclick="closeContact()" style="
+    margin-top:10px;
+    padding:8px 15px;
+    border:none;
+    background:#ff5c7a;
+    color:white;
+    border-radius:10px;
+    cursor:pointer;
+  ">
+      Close
+    </button>
+
+  </div>
+  <div id="overlay" style="
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.5);
+  z-index:999;
+"></div>
+
+  <footer style="background:#ff5c7a;color:white;text-align:center;padding:30px;">
+
+    <h3>Contact & Follow</h3>
+
+    <div style="margin:15px 0;display:flex;justify-content:center;gap:20px;">
+
+      <!-- INSTAGRAM -->
+      <a href="#" target="_blank">
+        <img src="https://img.icons8.com/?size=100&id=5eT5OnLluNOx&format=png&color=000000" width="28"
+          style="filter:brightness(0) invert(1);">
+      </a>
+
+      <!-- FACEBOOK -->
+      <a href="#" target="_blank">
+        <img src="https://img.icons8.com/?size=100&id=435&format=png&color=000000" width="28"
+          style="filter:brightness(0) invert(1);">
+      </a>
+
+      <!-- GOOGLE MAP -->
+      <a href="https://maps.google.com?q=colombo" target="_blank">
+        <img src="https://cdn-icons-png.flaticon.com/512/684/684908.png" width="28"
+          style="filter:brightness(0) invert(1);">
+      </a>
+
+      <!-- CONTACT ICON -->
+      <img src="https://cdn-icons-png.flaticon.com/512/561/561127.png" width="28"
+        style="cursor:pointer;filter:brightness(0) invert(1);" onclick="openContact()">
+
+    </div>
+
+    <p>© 2026 Bakeit Cake Shop</p>
+
+  </footer>
+
+  <script>function loadAuth() {
+      let user = JSON.parse(localStorage.getItem("user"));
+      let box = document.getElementById("authArea");
+
+      if (user) {
+        box.innerHTML = `
+      <span>Hi, ${user.first || "User"}</span>
+      <button class="btn" onclick="logout()">Logout</button>
+    `;
+      } else {
+        box.innerHTML = `
+      <button class="btn" onclick="window.location.href='login.html'">Login</button>
+      <button class="btn" onclick="window.location.href='signup.html'">Sign Up</button>
+    `;
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem("user");
+      location.reload();
+    }
+
+    loadAuth();</script>
+  <script>function goOrders() {
+      let user = JSON.parse(localStorage.getItem("user"));
+      if (!user) {
+        alert("Login first!");
+        window.location.href = "login.html";
+      } else {
+        window.location.href = "myorders.html";
+      }
+    }
+
+    function goProfile() {
+      let user = JSON.parse(localStorage.getItem("user"));
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        window.location.href = "profile.html";
+      }
+    }
+
+    function showMore() {
+      window.location.href = "product.html";
+    }</script>
+  <script>function loadAuth() {
+
+      let user = JSON.parse(localStorage.getItem("user"));
+      let box = document.getElementById("authArea");
+
+      // NOT LOGGED IN
+      if (!user) {
+        box.innerHTML = `
+      <button class="btn" onclick="window.location.href='login.html'">Login</button>
+      <button class="btn" onclick="window.location.href='signup.html'">Sign Up</button>
+    `;
+      }
+
+      // LOGGED IN
+      else {
+
+        // 👑 ADMIN USER
+        if (user.email === "admin@gmail.com") {
+          box.innerHTML = `
+
+        <img src="https://cdn-icons-png.flaticon.com/512/1046/1046857.png"
+             width="25"
+             onclick="goOrders()"
+             style="cursor:pointer;">
+
+        <img src="https://cdn-icons-png.flaticon.com/512/1077/1077114.png"
+             width="25"
+             onclick="goProfile()"
+             style="cursor:pointer;">
+
+        <button class="btn" onclick="goAdmin()">Admin</button>
+      `;
+        }
+
+        // NORMAL USER
+        else {
+          box.innerHTML = `
+
+        <img src="https://cdn-icons-png.flaticon.com/512/1046/1046857.png"
+             width="25"
+             onclick="goOrders()"
+             style="cursor:pointer;">
+
+        <img src="https://cdn-icons-png.flaticon.com/512/1077/1077114.png"
+             width="25"
+             onclick="goProfile()"
+             style="cursor:pointer;">
+      `;
+        }
+      }
+    }
+
+    // NAVIGATION
+    function goAdmin() {
+      window.location.href = "admin.html";
+    }
+
+    function goOrders() {
+      window.location.href = "myorders.html";
+    }
+
+    function goProfile() {
+      window.location.href = "profile.html";
+    }
+
+    // LOAD
+    loadAuth();</script>
+  <script>function openAbout() {
+      document.getElementById("aboutBox").style.display = "block";
+      document.getElementById("overlay").style.display = "block";
+    }
+
+    function closeAbout() {
+      document.getElementById("aboutBox").style.display = "none";
+      document.getElementById("overlay").style.display = "none";
+    }</script>
+  <script>document.getElementById("overlay").onclick = closeAbout;</script>
+  <script>function goProducts() {
+      let user = JSON.parse(localStorage.getItem("user"));
+
+      if (!user) {
+        openLoginPopup(); // show popup
+      } else {
+        window.location.href = "product.html";
+      }
+    }</script>
+  <script>function openLoginPopup() {
+      document.getElementById("loginPopup").style.display = "block";
+      document.getElementById("overlay").style.display = "block";
+    }
+
+    function closePopup() {
+      document.getElementById("loginPopup").style.display = "none";
+      document.getElementById("overlay").style.display = "none";
+    }
+
+    function goLogin() {
+      window.location.href = "login.html";
+    }</script>
+  <script>document.getElementById("overlay").onclick = closePopup;</script>
+  <script>function openContact() {
+      document.getElementById("contactBox").style.display = "block";
+      document.getElementById("overlay").style.display = "block";
+    }
+
+    function closeContact() {
+      document.getElementById("contactBox").style.display = "none";
+      document.getElementById("overlay").style.display = "none";
+    }
+
+    // CLICK OUTSIDE CLOSE
+    document.getElementById("overlay").onclick = closeContact;</script>
+
+
+</body>
+
+</html>

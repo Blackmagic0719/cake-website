@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Bakeit</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            background: url('images/main.png') no-repeat center/cover;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body {
+            background: url('images/bg.png') no-repeat center/cover;
+            animation: moveBg 20s infinite alternate ease-in-out;
+        }
+
+        @keyframes moveBg {
+            0% {
+                background-position: center top;
+            }
+
+            100% {
+                background-position: center bottom;
+            }
+        }
+
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            height: 40px;
+        }
+
+        .logo span {
+            font-weight: 700;
+            color: #ff5c7a;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .box {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            padding: 35px;
+            border-radius: 20px;
+            width: 380px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #ff5c7a;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: #e14a68;
+        }
+
+        a {
+            display: block;
+            margin-top: 15px;
+            color: #ff5c7a;
+            text-decoration: none;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.8);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            <a href="index.html"><img src="images/logo.png"></a>
+            <span>Bakeit</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="box">
+            <h2>Create Account</h2>
+
+            <div class="input-row">
+                <input type="text" id="first" placeholder="First Name">
+                <input type="text" id="last" placeholder="Last Name">
+            </div>
+
+            <input type="email" id="email" placeholder="Email" required>
+
+            <!-- ✅ ADDED MOBILE (FIX) -->
+            <input type="text" id="mobile" placeholder="Mobile Number" maxlength="10">
+            <input type="password" id="pass" placeholder="Password" maxlength="6">
+            <input type="password" id="confirm" placeholder="Confirm Password">
+
+            <button onclick="signup()">Sign Up</button>
+
+            <a href="login.html">Already have account? Login</a>
+        </div>
+    </div>
+
+    <script>
+        function signup() {
+
+            let first = document.getElementById("first").value.trim();
+            let last = document.getElementById("last").value.trim();
+            let email = document.getElementById("email").value.trim();
+            let mobile = document.getElementById("mobile").value.trim();
+            let pass = document.getElementById("pass").value;
+            let confirm = document.getElementById("confirm").value;
+
+            // 👇 FIELD BY FIELD CHECK (BETTER UX)
+
+            if (!first) {
+                alert("Enter your first name");
+                return;
+            }
+
+            if (!last) {
+                alert("Enter your last name");
+                return;
+            }
+
+            if (!email) {
+                alert("Enter your email");
+                return;
+            }
+
+            if (!email.includes("@") || !email.includes(".")) {
+                alert("Invalid email format (example@gmail.com)");
+                return;
+            }
+
+            if (!mobile) {
+                alert("Enter your phone number");
+                return;
+            }
+
+            if (!/^\d{10}$/.test(mobile)) {
+                alert("Phone number must be 10 digits");
+                return;
+            }
+
+            if (!pass) {
+                alert("Enter your password");
+                return;
+            }
+
+            if (pass.length < 6) {
+                alert("Password must be at least 6 characters");
+                return;
+            }
+
+            if (!/[A-Z]/.test(pass)) {
+                alert("Password must contain 1 uppercase letter");
+                return;
+            }
+
+            if (!/[0-9]/.test(pass)) {
+                alert("Password must contain 1 number");
+                return;
+            }
+
+            if (!confirm) {
+                alert("Confirm your password");
+                return;
+            }
+
+            if (pass !== confirm) {
+                alert("Passwords do not match");
+                return;
+            }
+
+            let users = JSON.parse(localStorage.getItem("users")) || [];
+
+            let exists = users.find(u => u.email === email);
+            if (exists) {
+                alert("Email already registered");
+                return;
+            }
+
+            let user = { first, last, email, mobile, pass, image: "" };
+
+            users.push(user);
+            localStorage.setItem("users", JSON.stringify(users));
+
+            alert("Signup successful 🎉");
+            window.location.href = "login.html";
+        }
+    </script>
+    <script>if (!/[!@#$%^&*]/.test(pass)) {
+            alert("Password must include special character (!@#$)");
+            return;
+        }</script>
+
+    <footer>
+        © 2026 Bakeit Cake Shop
+    </footer>
+
+</body>
+
+</html>
