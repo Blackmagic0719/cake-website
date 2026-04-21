@@ -1,0 +1,146 @@
+/* --- BAKEIT ADMIN STYLES (Includes Global Branding) --- */
+
+/* 1. GLOBAL DEFAULTS */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+:root {
+    --primary-pink: #ff5c7a;
+    --bg-light: #fff7f8;
+    --white: #ffffff;
+    --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+body {
+    background: var(--bg-light);
+    color: #333;
+}
+
+/* 2. HEADER & NAVIGATION */
+header {
+    background: var(--primary-pink);
+    color: var(--white);
+    padding: 15px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* 3. LAYOUT CONTAINERS */
+.container {
+    max-width: 1000px;
+    margin: auto;
+    padding: 20px;
+}
+
+.card {
+    background: var(--white);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+}
+
+/* 4. FORM ELEMENTS */
+input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    outline: none;
+}
+
+input:focus {
+    border-color: var(--primary-pink);
+}
+
+button {
+    background: var(--primary-pink);
+    color: var(--white);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* 5. PRODUCT LISTING */
+.product {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.product img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 10px;
+}
+
+/* 6. IMAGE UPLOAD AREA */
+.drop-area {
+    border: 2px dashed var(--primary-pink);
+    padding: 20px;
+    text-align: center;
+    border-radius: 10px;
+    cursor: pointer;
+    margin: 10px 0;
+    color: var(--primary-pink);
+}
+
+.drop-area:hover {
+    background: #fff0f3;
+}
+
+/* 7. ORDERS & STATUS */
+.order {
+    background: #fafafa;
+    padding: 15px;
+    margin-top: 10px;
+    border-radius: 10px;
+    line-height: 1.6;
+    border: 1px solid #eee;
+}
+
+.status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    display: inline-block;
+    font-weight: 600;
+}
+
+.pending {
+    background: #ffcc00;
+    color: #000;
+}
+
+.delivered {
+    background: #28a745;
+    color: var(--white);
+}
+
+/* 8. NOTIFICATIONS */
+#notifyList div {
+    background: #fff0f3;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-pink);
+}

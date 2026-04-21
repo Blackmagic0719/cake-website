@@ -1,0 +1,85 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: #fff7f8;
+}
+
+header {
+    background: white;
+    padding: 15px 40px;
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo img {
+    height: 40px;
+}
+
+.logo span {
+    font-size: 24px;
+    color: #ff5c7a;
+    font-weight: 600;
+}
+
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+}
+
+.order {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.item {
+    font-size: 14px;
+    color: #555;
+}
+
+.status {
+    margin-top: 10px;
+    font-weight: 600;
+}
+
+.delivery {
+    color: green;
+    margin-top: 5px;
+}
+
+.btn {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.cancel {
+    background: orange;
+    color: white;
+}
+
+.delete {
+    background: red;
+    color: white;
+}
+
+.empty {
+    text-align: center;
+    margin-top: 100px;
+    color: #888;
+}

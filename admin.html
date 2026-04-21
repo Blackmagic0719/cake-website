@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bakeit Admin Panel</title>
+    <link rel="stylesheet" href="style/admin/admin-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <header
+        style="display:flex;justify-content:space-between;align-items:center;padding:15px;background:#ff5c7a;color:white;">
+        <span style="font-weight:600;">🍰 Bakeit Admin Dashboard</span>
+        <button onclick="goHome()"
+            style="background:white; color:#ff5c7a; padding:8px 15px; border-radius:20px; border:none; cursor:pointer; font-weight:500;">
+            Home
+        </button>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>Add Product</h2>
+            <input type="text" id="name" placeholder="Product Name">
+            <input type="number" id="price" placeholder="Price">
+            <input type="text" id="category" placeholder="Category">
+
+            <div id="dropArea" class="drop-area">
+                Drag & Drop Image OR Click
+                <input type="file" id="fileInput" hidden>
+            </div>
+
+            <img id="preview" style="width:100px;margin-top:10px;display:none;">
+            <button onclick="addProduct()">Add Product</button>
+        </div>
+
+        <div class="card">
+            <h2>Products</h2>
+            <div id="productList"></div>
+        </div>
+
+        <div class="card">
+            <h2>Orders</h2>
+            <div id="orderList"></div>
+        </div>
+
+        <div class="card">
+            <h2>Notifications</h2>
+            <div id="notifyList"></div>
+            <button onclick="clearNotify()">Clear</button>
+        </div>
+    </div>
+
+    <script src="scripts/admin/admin.js"></script>
+</body>
+
+</html>

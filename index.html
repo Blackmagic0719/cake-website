@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bakeit Cake Shop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="scripts/firebase-config.js"></script>
+</head>
+
+<style>
+  /* --- CSS STYLES --- */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  body {
+    background: #fff7f8;
+    overflow-x: hidden;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    background: white;
+    flex-wrap: wrap;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+  }
+
+  .logo img {
+    height: 45px;
+  }
+
+  .logo span {
+    font-size: 26px;
+    font-weight: 600;
+    color: #ff5c7a;
+  }
+
+  .btn1 {
+    background: #ff5c7a;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+  }
+
+  .btn {
+    background: white;
+    color: #ff5c7a;
+    padding: 10px 20px;
+    border: 2px solid #ff5c7a;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn:hover {
+    background: #ff5c7a;
+    color: white;
+  }
+
+  /* HERO SECTION */
+  .hero {
+    position: relative;
+    height: 351px;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .hero img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    top: 0;
+    left: 0;
+    z-index: 1;
+  }
+
+  .hero::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    top: 0;
+    left: 0;
+    z-index: 2;
+  }
+
+  .hero-text {
+    position: relative;
+    z-index: 3;
+    color: white;
+    max-width: 600px;
+  }
+
+  .hero-text h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+  }
+
+  /* SECTION & CAKES */
+  .section {
+    padding: 60px 40px;
+    text-align: center;
+  }
+
+  .cakes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+  }
+
+  .cake {
+    background: white;
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .cake img {
+    width: 100%;
+    border-radius: 10px;
+  }
+
+  .see-more {
+    text-align: center;
+    margin: 40px 0 80px;
+  }
+
+  /* MODALS & OVERLAYS */
+  #overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
+
+  .modal-box {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    text-align: center;
+  }
+
+  footer {
+    background: #ff5c7a;
+    color: white;
+    text-align: center;
+    padding: 30px;
+  }
+
+  .social-icons img {
+    filter: brightness(0) invert(1);
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .social-icons img:hover {
+    transform: scale(1.1);
+  }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    .hero-text h1 {
+      font-size: 28px;
+    }
+
+    header {
+      padding: 10px 15px;
+    }
+
+    .header-right {
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo" onclick="location.reload()">
+      <img src="images/logo.png" alt="logo">
+      <span>Bakeit</span>
+    </div>
+    <div class="header-right" id="authArea">
+    </div>
+  </header>
+
+  <section class="hero">
+    <img src="images/main2.png" alt="hero cake">
+    <div class="hero-text">
+      <h1>Delicious Cake<br>For Everyone</h1>
+      <p>Freshly baked cakes made with love ❤️</p>
+      <button class="btn1" onclick="openAbout()">About Us</button>
+    </div>
+  </section>
+
+  <section class="section" id="menu">
+    <h2>Our Exclusive Cakes</h2>
+    <div class="cakes">
+      <div class="cake">
+        <img src="images/cake3.jpeg" alt="Chocolate">
+        <h3>Birthday Cake</h3>
+      </div>
+      <div class="cake">
+        <img src="images/cake2.jpeg" alt="Black Forest">
+        <h3>Purple Forest</h3>
+      </div>
+      <div class="cake">
+        <img src="images/cake.jpeg" alt="Strawberry">
+        <h3>Golden Pearl Cake</h3>
+      </div>
+    </div>
+  </section>
+
+  <div class="see-more">
+    <button class="btn" onclick="goProducts()">See More Cakes</button>
+  </div>
+
+  <div id="overlay" onclick="closeAllModals()"></div>
+
+  <div id="aboutBox" class="modal-box">
+    <h2>About Bakeit 🍰</h2>
+    <p style="margin-top:15px;color:#555;">
+      Welcome to Bakeit — your favorite place for fresh and delicious cakes.
+      We bake with love and use high-quality ingredients to make every celebration special ❤️
+    </p>
+    <button class="btn1" style="margin-top:20px;" onclick="closeAllModals()">Close</button>
+  </div>
+
+  <div id="loginPopup" class="modal-box">
+    <h3>Please login first 🔐</h3>
+    <button class="btn1" style="margin-top:15px;" onclick="window.location.href='login.html'">Go to Login</button>
+    <br><br>
+    <button onclick="closeAllModals()"
+      style="border:none; background:#ddd; padding:8px 15px; border-radius:10px; cursor:pointer;">Close</button>
+  </div>
+
+  <div id="contactBox" class="modal-box">
+    <h3>Contact Info</h3>
+    <p style="margin-top:10px;">📧 bakeit@gmail.com</p>
+    <p><a href="https://wa.me/94769207762" target="_blank" style="color:#25D366; text-decoration:none;">💬 WhatsApp</a>
+    </p>
+    <button class="btn1" style="margin-top:10px;" onclick="closeAllModals()">Close</button>
+  </div>
+
+  <footer>
+    <h3>Contact & Follow</h3>
+    <div class="social-icons" style="margin:15px 0; display:flex; justify-content:center; gap:20px;">
+      <a href="#"><img src="https://img.icons8.com/?size=100&id=5eT5OnLluNOx&format=png" width="28"
+          onclick="https://www.instagram.com/bakeit_bynad/"></a>
+      <img src="https://cdn-icons-png.flaticon.com/512/561/561127.png" width="28" onclick="openContact()">
+    </div>
+    <p>© 2026 Bakeit Cake Shop</p>
+  </footer>
+
+  <script>
+    // 1. AUTHENTICATION LOADING
+    function loadAuth() {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const authArea = document.getElementById("authArea");
+
+      if (!user) {
+        // GUEST VIEW
+        authArea.innerHTML = `
+          <button class="btn" onclick="window.location.href='login.html'">Login</button>
+          <button class="btn" onclick="window.location.href='signup.html'">Sign Up</button>
+        `;
+      } else {
+        // LOGGED IN VIEW
+        let html = `
+          <img src="https://cdn-icons-png.flaticon.com/512/1046/1046857.png" width="25" title="My Orders" onclick="window.location.href='myorders.html'" style="cursor:pointer;">
+          <img src="https://cdn-icons-png.flaticon.com/512/1077/1077114.png" width="25" title="Profile" onclick="window.location.href='profile.html'" style="cursor:pointer;">
+        `;
+
+        if (user.email === "admin@gmail.com") {
+          html += `<button class="btn" onclick="window.location.href='admin.html'">Admin</button>`;
+        } else {
+          html += `<button class="btn" onclick="logout()">Logout</button>`;
+        }
+
+        authArea.innerHTML = html;
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem("user");
+      location.reload();
+    }
+
+    // 2. NAVIGATION LOGIC
+    function goProducts() {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user) {
+        openLoginPopup();
+      } else {
+        window.location.href = "product.html";
+      }
+    }
+
+    // 3. MODAL CONTROL
+    function openAbout() {
+      document.getElementById("aboutBox").style.display = "block";
+      document.getElementById("overlay").style.display = "block";
+    }
+
+    function openLoginPopup() {
+      document.getElementById("loginPopup").style.display = "block";
+      document.getElementById("overlay").style.display = "block";
+    }
+
+    function openContact() {
+      document.getElementById("contactBox").style.display = "block";
+      document.getElementById("overlay").style.display = "block";
+    }
+
+    function closeAllModals() {
+      document.getElementById("aboutBox").style.display = "none";
+      document.getElementById("loginPopup").style.display = "none";
+      document.getElementById("contactBox").style.display = "none";
+      document.getElementById("overlay").style.display = "none";
+    }
+
+    // Initial Load
+    loadAuth();
+  </script>
+
+</body>
+
+</html>2

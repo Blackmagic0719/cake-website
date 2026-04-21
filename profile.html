@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Bakeit</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="scripts/firebase-config.js"></script>
+</head>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+        background: url('images/bg.png') no-repeat center/cover;
+        animation: moveBg 20s infinite alternate ease-in-out;
+    }
+
+    @keyframes moveBg {
+        0% {
+            background-position: center top;
+        }
+
+        100% {
+            background-position: center bottom;
+        }
+    }
+
+    /* HEADER */
+    header {
+        background: white;
+        padding: 15px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .logo img {
+        height: 40px;
+    }
+
+    .logo span {
+        font-size: 24px;
+        color: #ff5c7a;
+        font-weight: 600;
+    }
+
+    /* CONTAINER */
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 85vh;
+    }
+
+    /* PROFILE CARD */
+    .profile-box {
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        width: 360px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    /* IMAGE FIX */
+    .profile-img {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 15px;
+        border: 4px solid #ff5c7a;
+        background: #fff;
+    }
+
+    /* INPUT */
+    input {
+        margin-top: 10px;
+    }
+
+    /* INFO */
+    .info {
+        margin: 8px 0;
+        color: #555;
+    }
+
+    /* BUTTONS */
+    .btn {
+        width: 100%;
+        padding: 12px;
+        margin-top: 10px;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .choose-btn {
+        background: #ff5c7a;
+        color: white;
+    }
+
+    .logout-btn {
+        background: #eee;
+    }
+
+    .save-btn {
+        background: #222;
+        color: white;
+    }
+</style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            <a href="index.html"><img src="images/logo.png"></a>
+            <span>Bakeit</span>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <div class="profile-box">
+
+            <!-- IMAGE -->
+            <img id="profileImg" class="profile-img" src="images/user.png">
+
+            <h2 id="name"></h2>
+            <p class="info" id="email"></p>
+            <p class="info" id="mobile"></p>
+
+            <!-- FILE INPUT -->
+            <input type="file" id="fileInput" style="display:none;">
+
+            <input type="file" id="fileInput" style="display:none;" onchange="showFileName()">
+
+            <button class="btn choose-btn" onclick="document.getElementById('fileInput').click()">
+                📸 Upload Profile Image
+            </button>
+
+            <p id="fileName"></p>
+
+
+            <!-- SAVE BUTTON -->
+            <button class="btn save-btn" onclick="saveImage()">Save Image</button>
+
+            <button class="btn logout-btn" onclick="logout()">Logout</button>
+
+        </div>
+
+    </div>
+
+    <script>
+        // GET USER
+        let user = JSON.parse(localStorage.getItem("user"));
+
+        // PROTECT
+        if (!user) {
+            alert("Please login first!");
+            window.location.href = "login.html";
+        }
+
+        // SHOW DATA
+        document.getElementById("name").innerText = user.first + " " + user.last;
+        document.getElementById("email").innerText = user.email;
+        document.getElementById("mobile").innerText = user.mobile;
+
+        // DEFAULT IMAGE
+        if (user.image) {
+            document.getElementById("profileImg").src = user.image;
+        } else {
+            document.getElementById("profileImg").src = "images/user.png";
+        }
+
+        // SAVE IMAGE BUTTON
+        function saveImage() {
+
+            let file = document.getElementById("fileInput").files[0];
+
+            if (!file) {
+                alert("Please choose an image first!");
+                return;
+            }
+
+            let reader = new FileReader();
+
+            reader.onload = function (e) {
+                user.image = e.target.result;
+                localStorage.setItem("user", JSON.stringify(user));
+
+                document.getElementById("profileImg").src = user.image;
+
+                alert("Profile image updated!");
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        // NAVIGATION
+        function logout() {
+            localStorage.removeItem("user");
+            window.location.href = "login.html";
+        }
+    </script>
+    <script>function showFileName() {
+            let file = document.getElementById("fileInput").files[0];
+
+            if (file) {
+                document.getElementById("fileName").innerText = file.name;
+            }
+        }</script>
+
+</body>
+
+</html>

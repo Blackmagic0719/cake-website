@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bakeit Products</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="style/product/product.css">
+    <script src="scripts/firebase-config.js"></script>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            <a href="index.html"><img src="images/logo.png"></a>
+            <span>Bakeit</span>
+        </div>
+        <div class="header-actions">
+            <div class="cart-btn-container" onclick="toggleCart()">
+                <div class="cart-icon-wrapper">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                    <span id="cartCount">0</span>
+                </div>
+                <span class="cart-text">My Cart</span>
+            </div>
+
+            <div class="orders-icon" onclick="goOrders()">
+                <img src="https://cdn-icons-png.flaticon.com/512/1046/1046857.png" width="26">
+            </div>
+        </div>
+    </header>
+
+    <h2 style="text-align:center;margin:20px;">Our Cakes</h2>
+
+    <div class="container" style="display: flex; align-items: flex-start; gap: 20px; padding: 20px;">
+        <div class="sidebar"
+            style="width: 280px; flex-shrink: 0; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+            <div class="filter-group">
+                <h3>Sort By</h3>
+                <select id="sortPrice" onchange="filterProducts()" class="sort-select">
+                    <option value="default">Default</option>
+                    <option value="lowHigh">Price: Low to High</option>
+                    <option value="highLow">Price: High to Low</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <h3>Categories</h3>
+                <label><input type="checkbox" value="chocolate" onchange="filterProducts()"> Chocolate</label>
+                <label><input type="checkbox" value="fruit" onchange="filterProducts()"> Fruit</label>
+                <label><input type="checkbox" value="birthday" onchange="filterProducts()"> Birthday</label>
+
+                <label><input type="checkbox" value="celebration" onchange="filterProducts()"> Celebration Cakes</label>
+                <label><input type="checkbox" value="cupcakes" onchange="filterProducts()"> Cupcakes</label>
+                <label><input type="checkbox" value="bento" onchange="filterProducts()"> Bento & Bento Combos</label>
+                <label><input type="checkbox" value="jars" onchange="filterProducts()"> Cake Jars & Slices</label>
+                <label><input type="checkbox" value="gift" onchange="filterProducts()"> Gift Boxes</label>
+                <label><input type="checkbox" value="seasonal" onchange="filterProducts()"> Seasonal
+                    (Awurudu/Christmas)</label>
+            </div>
+
+            <div class="filter-group">
+                <h3>Price Range</h3>
+                <input type="range" min="250" max="10000" value="10000" id="priceRange" oninput="filterProducts()">
+                <p>Max: Rs.<span id="priceValue">10000</span></p>
+            </div>
+            <button onclick="openCustomModal()"
+                style="width:100%; padding:12px; background:#ff5c7a; color:white; border:none; border-radius:10px; margin-top:15px; cursor:pointer; font-weight:600;">
+                🎂 Order Custom Cake
+            </button>
+
+        </div>
+
+        <div id="productList" class="products"
+            style="flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px;">
+        </div>
+    </div>
+
+    <div id="cartBox" class="cart-box">
+        <h2>Your Cart</h2>
+        <div id="cartItems"></div>
+        <div class="cart-footer">
+            <h3 id="total">Total: Rs.0</h3>
+            <button class="checkout-btn" onclick="goCheckout()">Checkout</button>
+            <button class="close-btn" onclick="toggleCart()">Close</button>
+        </div>
+    </div>
+    <div id="customModal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
+        <div
+            style="background:white; width:90%; max-width:500px; margin:50px auto; padding:25px; border-radius:15px; position:relative;">
+            <h3>Describe Your Custom Cake</h3>
+            <p style="font-size: 12px; color: #666;">Admin will provide the price after review.</p>
+
+            <textarea id="customCakeDesc" maxlength="300"
+                placeholder="Type your cake requirements here (e.g., flavor, theme, colors)..."
+                style="width:100%; height:150px; margin:15px 0; padding:10px; border-radius:10px; border:1px solid #ddd; font-family:inherit; resize:none;"></textarea>
+
+            <div style="text-align:right; font-size:12px; color:#999;" id="charCount">0 / 300</div>
+
+            <button onclick="addCustomToCart()"
+                style="width:100%; padding:12px; background:#ff5c7a; color:white; border:none; border-radius:25px; cursor:pointer;">Add
+                to Cart</button>
+            <button onclick="closeCustomModal()"
+                style="width:100%; padding:12px; background:none; border:none; color:#666; cursor:pointer; margin-top:5px;">Cancel</button>
+        </div>
+    </div>
+
+    <script src="scripts/cart/cart.js"></script>
+    <script src="scripts/product/product-logic.js"></script>
+
+</body>
+
+</html>
