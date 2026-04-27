@@ -1,32 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Orders - Bakeit</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style/myorders/style.css">
-    <script src="scripts/firebase-config.js"></script>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Orders — Bakeit</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style/shared.css">
+  <script src="scripts/firebase-config.js"></script>
+  <style>
+    .page-body{padding-top:var(--nav-h);}
+    .page-header{background:var(--dark);padding:52px 40px 48px;text-align:center;}
+    .page-header h1{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,5vw,48px);font-weight:300;color:white;}
+    .page-header h1 em{font-style:italic;color:#f5d5dc;}
+    .page-header p{font-size:14px;color:rgba(255,255,255,.45);margin-top:8px;}
+    .orders-wrap{max-width:820px;margin:40px auto;padding:0 40px;}
+    @media(max-width:768px){.orders-wrap{padding:0 20px;margin:28px auto;}}
+    .order-card{background:white;border-radius:var(--radius-lg);box-shadow:var(--shadow);margin-bottom:20px;overflow:hidden;transition:box-shadow .3s;}
+    .order-card:hover{box-shadow:var(--shadow-lg);}
+    .order-card-header{padding:20px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border-bottom:1px solid var(--border);}
+    .order-id{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--rose);}
+    .order-date{font-size:12px;color:var(--muted);}
+    .order-card-body{padding:20px 24px;}
+    .order-items-list{margin-bottom:16px;}
+    .oi{display:flex;justify-content:space-between;font-size:14px;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.04);}
+    .oi:last-child{border-bottom:none;}
+    .oi-name{color:var(--dark);}
+    .oi-price{font-weight:600;color:var(--rose);}
+    .order-meta{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:16px;}
+    .meta-item{font-size:13px;color:var(--mid);}
+    .meta-item strong{color:var(--dark);font-weight:600;}
+    .delivery-date-box{display:flex;align-items:center;gap:10px;background:var(--gold-pale);border:1px solid rgba(201,169,110,.3);border-radius:var(--radius);padding:12px 16px;margin-bottom:16px;}
+    .delivery-date-box .icon{font-size:20px;}
+    .delivery-date-box .label{font-size:11px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;}
+    .delivery-date-box .value{font-size:15px;font-weight:600;color:var(--dark);}
+    .order-total-row{display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid var(--border);}
+    .order-total-row span{font-size:14px;color:var(--mid);}
+    .order-total-row strong{font-size:18px;font-weight:700;color:var(--dark);}
+    .order-actions{padding:14px 24px;background:var(--cream);display:flex;gap:10px;flex-wrap:wrap;}
+    .empty-orders{text-align:center;padding:100px 20px;color:var(--muted);}
+    .empty-orders .icon{font-size:60px;margin-bottom:20px;}
+    .empty-orders h2{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--dark);margin-bottom:10px;}
+    .empty-orders p{font-size:15px;margin-bottom:28px;}
+    .pending-price-notice{background:var(--rose-pale);border:1px solid rgba(232,85,109,.2);border-radius:var(--radius);padding:10px 14px;font-size:13px;color:var(--rose-deep);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+  </style>
 </head>
-
 <body>
+<nav class="nav" id="navbar">
+  <a class="nav-logo" href="index.html"><img src="images/logo.png"><span class="nav-brand">Bakeit</span></a>
+  <div class="nav-right">
+    <button class="btn-ghost btn-sm" onclick="location.href='product.html'">Shop</button>
+    <button class="btn-ghost btn-sm" onclick="location.href='profile.html'">Profile</button>
+    <button class="btn-ghost btn-sm" onclick="logout()">Logout</button>
+  </div>
+</nav>
+<div class="page-body">
+  <div class="page-header">
+    <h1>My <em>Orders</em></h1>
+    <p>Track all your Bakeit orders in one place</p>
+  </div>
+  <div class="orders-wrap" id="ordersWrap"></div>
+</div>
+<script src="scripts/shared.js"></script>
+<script>
+  initNavScroll('navbar');
+  const user = requireAuth();
 
-    <header>
-        <div class="logo">
-            <a href="index.html"><img src="images/logo.png"></a>
-            <span>Bakeit</span>
+  function render(){
+    const wrap=document.getElementById('ordersWrap');
+    const orders=getOrders();
+    const mine=orders.map((o,i)=>({...o,_idx:i})).filter(o=>o.email===user.email).reverse();
+    if(mine.length===0){
+      wrap.innerHTML=`<div class="empty-orders"><div class="icon">🧁</div><h2>No orders yet</h2><p>Browse our collection and place your first order!</p><button class="btn-primary btn-lg" onclick="location.href='product.html'">Explore Cakes</button></div>`;
+      return;
+    }
+    wrap.innerHTML=mine.map(o=>{
+      const hasPendingPrice=o.items.some(i=>i.price===0||!i.price);
+      const itemsHtml=o.items.map(item=>{
+        const isCustom=item.price===0||!item.price;
+        return `<div class="oi"><span class="oi-name">${item.name} ×${item.qty}${item.details?` <span style="font-size:11px;color:var(--muted)">(custom)</span>`:''}</span><span class="oi-price">${isCustom?'TBD':formatRs(item.price*item.qty)}</span></div>`;
+      }).join('');
+      return `<div class="order-card fade-up">
+        <div class="order-card-header">
+          <div>
+            <div class="order-id">${o.id}</div>
+            <div class="order-date">Placed: ${formatDateTime(o.placedAt)}</div>
+          </div>
+          ${statusBadge(o.status||'Pending')}
         </div>
-    </header>
+        <div class="order-card-body">
+          ${hasPendingPrice?`<div class="pending-price-notice">⏳ Price for your custom cake is being reviewed. We'll update you soon.</div>`:''}
+          <div class="order-items-list">${itemsHtml}</div>
+          <div class="order-meta">
+            <div class="meta-item">📍 <strong>${o.address||'—'}</strong></div>
+            <div class="meta-item">📞 <strong>${o.mobile||'—'}</strong></div>
+            ${o.notes?`<div class="meta-item">📝 <strong>${o.notes}</strong></div>`:''}
+          </div>
+          ${o.deliveryDate?`
+          <div class="delivery-date-box">
+            <div class="icon">📅</div>
+            <div><div class="label">Estimated Delivery</div><div class="value">${formatDate(o.deliveryDate)}</div></div>
+          </div>`:''}
+          <div class="order-total-row"><span>Order Total</span><strong>${formatRs(o.total)}</strong></div>
+        </div>
+        <div class="order-actions">
+          ${(o.status!=='Delivered'&&o.status!=='Cancelled')?`<button class="btn-danger btn-sm" onclick="cancelOrder(${o._idx})">Cancel Order</button>`:''}
+          ${o.status==='Delivered'?`<button class="btn-ghost btn-sm" onclick="deleteRecord(${o._idx})">Delete Record</button>`:''}
+        </div>
+      </div>`;
+    }).join('');
+    initScrollAnimations();
+  }
 
-    <div class="container">
-        <h2 style="text-align:center;margin-bottom:20px;">My Orders</h2>
-        <div id="orderList"></div>
-    </div>
-
-    <script src="scripts/myorders/script.js"></script>
-
+  function cancelOrder(idx){
+    if(!confirm('Are you sure you want to cancel this order?'))return;
+    const orders=getOrders();
+    orders[idx].status='Cancelled';
+    saveOrders(orders);
+    addNotification(`Order ${orders[idx].id} cancelled by ${user.first||user.email}`,'warning');
+    showToast('Order cancelled.','default');
+    render();
+  }
+  function deleteRecord(idx){
+    if(!confirm('Delete this order record?'))return;
+    const orders=getOrders();
+    if(orders[idx].status==='Delivered'){orders.splice(idx,1);saveOrders(orders);}
+    render();
+  }
+  document.addEventListener('DOMContentLoaded',render);
+</script>
 </body>
-
 </html>

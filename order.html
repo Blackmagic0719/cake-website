@@ -1,318 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Checkout - Bakeit</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout — Bakeit</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style/shared.css">
   <script src="scripts/firebase-config.js"></script>
+  <style>
+    .page-body{padding-top:var(--nav-h);}
+    .page-header{background:var(--dark);padding:48px 40px 44px;text-align:center;}
+    .page-header h1{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,5vw,48px);font-weight:300;color:white;}
+    .page-header h1 em{font-style:italic;color:#f5d5dc;}
+    .checkout-layout{display:flex;gap:28px;max-width:1000px;margin:40px auto;padding:0 40px;}
+    @media(max-width:768px){.checkout-layout{flex-direction:column;padding:0 20px;}}
+    .checkout-form-card,.order-summary-card{background:white;border-radius:var(--radius-lg);padding:32px;box-shadow:var(--shadow);}
+    .checkout-form-card{flex:1;}
+    .order-summary-card{width:340px;flex-shrink:0;align-self:flex-start;position:sticky;top:calc(var(--nav-h)+20px);}
+    @media(max-width:768px){.order-summary-card{width:100%;position:static;}}
+    .section-heading{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:var(--dark);margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+    .phone-row{display:flex;gap:12px;}
+    .phone-row select{width:130px;flex-shrink:0;}
+    .order-item{display:flex;justify-content:space-between;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border);}
+    .order-item:last-child{border-bottom:none;}
+    .order-item-name{font-size:14px;font-weight:500;color:var(--dark);}
+    .order-item-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+    .order-item-price{font-size:14px;font-weight:600;color:var(--rose);white-space:nowrap;margin-left:12px;}
+    .order-total{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:16px;border-top:2px solid var(--border);}
+    .order-total span{font-size:15px;color:var(--mid);}
+    .order-total strong{font-size:20px;font-weight:700;color:var(--dark);}
+    .payment-option{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1.5px solid var(--border);border-radius:var(--radius);margin-bottom:10px;cursor:pointer;transition:all .2s;}
+    .payment-option.selected{border-color:var(--rose);background:var(--rose-pale);}
+    .payment-option input[type=radio]{accent-color:var(--rose);}
+    .payment-option-label{font-size:14px;font-weight:500;color:var(--dark);}
+    .payment-option-sub{font-size:12px;color:var(--muted);}
+    .place-order-btn{width:100%;padding:15px;background:var(--dark);color:white;border:none;border-radius:var(--radius-full);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all .3s;margin-top:20px;display:flex;align-items:center;justify-content:center;gap:10px;}
+    .place-order-btn:hover{background:var(--dark2);transform:translateY(-1px);box-shadow:0 8px 24px rgba(26,18,24,.3);}
+    /* success popup */
+    .success-popup{display:none;position:fixed;inset:0;background:rgba(26,18,24,.65);backdrop-filter:blur(6px);z-index:900;align-items:center;justify-content:center;padding:20px;}
+    .success-popup.active{display:flex;}
+    .success-card{background:white;border-radius:var(--radius-xl);padding:52px 44px;text-align:center;max-width:440px;width:100%;box-shadow:var(--shadow-xl);animation:modalIn .4s cubic-bezier(.34,1.56,.64,1);}
+    @keyframes modalIn{from{opacity:0;transform:scale(.9) translateY(20px);}to{opacity:1;transform:scale(1) translateY(0);}}
+    .success-icon{font-size:56px;margin-bottom:16px;animation:bounce .6s .3s both;}
+    @keyframes bounce{0%{transform:scale(.5);}70%{transform:scale(1.15);}100%{transform:scale(1);}}
+    .success-card h2{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:400;color:var(--dark);margin-bottom:10px;}
+    .success-card p{font-size:14px;color:var(--mid);margin-bottom:6px;line-height:1.6;}
+    .order-id-pill{display:inline-block;background:var(--rose-pale);color:var(--rose);font-size:18px;font-weight:700;padding:8px 24px;border-radius:var(--radius-full);margin:12px 0 24px;letter-spacing:.06em;}
+  </style>
 </head>
-
-<style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-  }
-
-  body {
-    background: #fff7f8;
-    color: #333;
-  }
-
-  .top-bar {
-    display: flex;
-    justify-content: flex-end;
-    padding: 15px 20px;
-  }
-
-  .home-btn {
-    background: #ff5c7a;
-    color: white;
-    border: none;
-    padding: 8px 18px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-weight: 500;
-  }
-
-  .container {
-    max-width: 1000px;
-    margin: 20px auto;
-    display: flex;
-    gap: 30px;
-    padding: 0 20px;
-  }
-
-  .box {
-    background: white;
-    padding: 25px;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    flex: 1;
-  }
-
-  h2 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #ff5c7a;
-  }
-
-  h3 {
-    margin-bottom: 15px;
-    font-size: 18px;
-    border-bottom: 2px solid #fff1f3;
-    padding-bottom: 5px;
-  }
-
-  input,
-  select {
-    width: 100%;
-    padding: 12px;
-    margin: 10px 0;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    outline: none;
-  }
-
-  input:focus {
-    border-color: #ff5c7a;
-  }
-
-  .phone {
-    display: flex;
-    gap: 10px;
-  }
-
-  .phone select {
-    width: 35%;
-  }
-
-  .btn {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 30px;
-    background: #ff5c7a;
-    color: white;
-    margin-top: 10px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 16px;
-    transition: 0.3s;
-  }
-
-  .btn:hover {
-    background: #e04b65;
-  }
-
-  .btn-outline {
-    background: white;
-    border: 2px solid #ff5c7a;
-    color: #ff5c7a;
-  }
-
-  .btn-outline:hover {
-    background: #fff1f3;
-  }
-
-  .order-item {
-    border-bottom: 1px solid #eee;
-    padding: 12px 0;
-  }
-
-  .price-pending {
-    color: #ff5c7a;
-    font-weight: 600;
-    font-size: 14px;
-  }
-
-  .popup {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 40px;
-    border-radius: 20px;
-    text-align: center;
-    display: none;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
-    width: 90%;
-    max-width: 400px;
-  }
-
-  .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: none;
-    z-index: 999;
-  }
-
-  @media (max-width: 768px) {
-    .container {
-      flex-direction: column;
-    }
-  }
-</style>
-</head>
-
 <body>
-
-  <div class="top-bar">
-    <button class="home-btn" onclick="goHome()">🏠 Home</button>
+<nav class="nav" id="navbar">
+  <a class="nav-logo" href="index.html"><img src="images/logo.png"><span class="nav-brand">Bakeit</span></a>
+  <div class="nav-right">
+    <button class="btn-ghost btn-sm" onclick="location.href='product.html'">← Back to Cakes</button>
   </div>
+</nav>
+<div class="page-body">
+  <div class="page-header">
+    <h1>Complete Your <em>Order</em></h1>
+  </div>
+  <div class="checkout-layout">
+    <!-- FORM -->
+    <div class="checkout-form-card">
+      <h2 class="section-heading">Delivery Details</h2>
+      <div class="field"><label>Full Name</label><input type="text" id="name" placeholder="Nadeesha Perera"></div>
+      <div class="field"><label>Street / House Number</label><input type="text" id="house" placeholder="42/B, Lotus Lane"></div>
+      <div class="field"><label>City</label><input type="text" id="city" placeholder="Colombo"></div>
+      <div class="field"><label>State / Province</label><input type="text" id="state" placeholder="Western Province"></div>
+      <div class="field"><label>Postal Code</label><input type="text" id="postal" placeholder="10120"></div>
+      <div class="field">
+        <label>Phone Number</label>
+        <div class="phone-row">
+          <select id="countryCode" class="field-inner" style="padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:14px;background:white;outline:none;color:var(--dark);">
+            <option value="+94">🇱🇰 +94</option>
+            <option value="+91">🇮🇳 +91</option>
+            <option value="+1">🇺🇸 +1</option>
+          </select>
+          <div class="field" style="flex:1;margin-bottom:0;"><input type="text" id="mobile" placeholder="07X XXX XXXX"></div>
+        </div>
+      </div>
+      <div class="field"><label>Delivery Notes (Optional)</label><textarea id="notes" placeholder="Gate code, specific time preferences, etc." style="height:80px;"></textarea></div>
 
-  <h2>Checkout</h2>
-
-  <div class="container">
-    <div class="box">
-      <h3>Delivery Details</h3>
-      <input type="text" id="name" placeholder="Full Name">
-      <input type="text" id="house" placeholder="House Number / Street">
-      <input type="text" id="city" placeholder="City">
-      <input type="text" id="state" placeholder="State">
-      <input type="text" id="postal" placeholder="Postal Code">
-
-      <div class="phone">
-        <select id="country">
-          <option value="+94">🇱🇰 +94</option>
-          <option value="+91">🇮🇳 +91</option>
-          <option value="+1">🇺🇸 +1</option>
-        </select>
-        <input type="text" id="mobile" placeholder="Phone Number">
+      <h2 class="section-heading" style="margin-top:28px;">Payment Method</h2>
+      <div class="payment-option selected" id="cod" onclick="selectPayment('cod')">
+        <input type="radio" name="payment" value="cod" checked>
+        <div><div class="payment-option-label">💵 Cash on Delivery</div><div class="payment-option-sub">Pay when your cake arrives</div></div>
+      </div>
+      <div class="payment-option" id="card" onclick="selectPayment('card')" style="opacity:.55;cursor:not-allowed;">
+        <input type="radio" name="payment" value="card" disabled>
+        <div><div class="payment-option-label">💳 Card Payment</div><div class="payment-option-sub">Coming soon</div></div>
       </div>
 
-      <h3>Payment</h3>
-      <button class="btn" onclick="placeOrder()">Cash on Delivery</button>
-      <button class="btn btn-outline" style="opacity: 0.6; cursor: not-allowed;">Card Payment (Coming Soon)</button>
+      <button class="place-order-btn" onclick="placeOrder()">
+        <span>Place Order</span>
+        <span>→</span>
+      </button>
     </div>
 
-    <div class="box">
-      <h3>Your Order</h3>
+    <!-- ORDER SUMMARY -->
+    <div class="order-summary-card">
+      <h2 class="section-heading">Order Summary</h2>
       <div id="orderItems"></div>
-      <h3 id="total" style="margin-top:20px; border-top: 2px solid #ff5c7a; padding-top:10px;">Total: Rs.0</h3>
+      <div class="order-total">
+        <span>Total</span>
+        <strong id="orderTotal">Rs.0</strong>
+      </div>
     </div>
   </div>
+</div>
 
-  <div id="overlay" class="overlay"></div>
-  <div id="popup" class="popup">
-    <div id="popupContent"></div>
+<!-- SUCCESS POPUP -->
+<div class="success-popup" id="successPopup">
+  <div class="success-card">
+    <div class="success-icon">🎉</div>
+    <h2>Order Placed!</h2>
+    <p>Thank you for your order. Keep this order ID for tracking:</p>
+    <div class="order-id-pill" id="successOrderId">BK-00000</div>
+    <p style="margin-bottom:28px;">We will confirm your delivery date shortly.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn-primary" onclick="location.href='myorders.html'">View My Orders</button>
+      <button class="btn-ghost" onclick="location.href='index.html'">Back to Home</button>
+    </div>
   </div>
+</div>
 
-  <script>
-    // 🔐 LOGIN PROTECTION
-    let user = JSON.parse(localStorage.getItem("user"));
-    if (!user) {
-      alert("Please login first!");
-      window.location.href = "login.html";
-    }
+<script src="scripts/shared.js"></script>
+<script>
+  initNavScroll('navbar');
+  const user = requireAuth();
 
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    let orders = JSON.parse(localStorage.getItem("orders")) || [];
+  function selectPayment(type){
+    document.getElementById('cod').classList.toggle('selected', type==='cod');
+  }
 
-    // 1. LOAD ORDER SUMMARY
-    function loadOrder() {
-      let itemsBox = document.getElementById("orderItems");
-      let total = 0;
-      itemsBox.innerHTML = ""; // Clear box
+  function loadSummary(){
+    const cart=getCart();
+    const el=document.getElementById('orderItems');
+    let total=0;
+    if(cart.length===0){location.href='product.html';return;}
+    el.innerHTML=cart.map(item=>{
+      const isCustom=item.price===0||!item.price;
+      const itemTotal=isCustom?0:item.price*item.qty;
+      total+=itemTotal;
+      return `<div class="order-item">
+        <div>
+          <div class="order-item-name">${item.name} ×${item.qty}</div>
+          ${item.details?`<div class="order-item-sub">${item.details.substring(0,60)}${item.details.length>60?'...':''}</div>`:''}
+        </div>
+        <div class="order-item-price">${isCustom?'⏳ TBD':formatRs(itemTotal)}</div>
+      </div>`;
+    }).join('');
+    document.getElementById('orderTotal').textContent=formatRs(total);
+  }
 
-      if (cart.length === 0) {
-        itemsBox.innerHTML = "<p>Your cart is empty.</p>";
-        return;
-      }
+  function placeOrder(){
+    const name=document.getElementById('name').value.trim();
+    const house=document.getElementById('house').value.trim();
+    const city=document.getElementById('city').value.trim();
+    const state=document.getElementById('state').value.trim();
+    const postal=document.getElementById('postal').value.trim();
+    const mobile=document.getElementById('mobile').value.trim();
+    const cc=document.getElementById('countryCode').value;
+    const notes=document.getElementById('notes').value.trim();
+    if(!name||!house||!city||!state||!mobile){showToast('Please fill in all required fields.','error');return;}
+    if(!/^\d{7,12}$/.test(mobile.replace(/\s/g,''))){showToast('Please enter a valid phone number.','error');return;}
+    const cart=getCart();
+    if(cart.length===0){showToast('Your cart is empty!','warning');return;}
+    const id='BK-'+Math.floor(10000+Math.random()*90000);
+    const total=cart.reduce((s,i)=>s+(i.price||0)*i.qty,0);
+    const newOrder={
+      id, name, email:user.email,
+      address:`${house}, ${city}, ${state}, ${postal}`,
+      mobile:cc+mobile, notes,
+      items:cart, total,
+      status:'Pending',
+      deliveryDate:null,
+      placedAt:new Date().toISOString(),
+      priceConfirmed:false
+    };
+    const orders=getOrders();
+    orders.push(newOrder);
+    saveOrders(orders);
+    saveCart([]);
+    addNotification(`New order ${id} placed by ${name}`,'info');
+    document.getElementById('successOrderId').textContent=id;
+    document.getElementById('successPopup').classList.add('active');
+  }
 
-      cart.forEach(item => {
-        // If price is 0, it's a custom cake
-        let isCustom = (item.price === 0 || !item.price);
-        let itemTotal = isCustom ? 0 : (item.price * item.qty);
-        let displayPrice = isCustom ? "Price Pending (Admin will contact you)" : "Rs." + itemTotal;
-
-        total += itemTotal;
-
-        itemsBox.innerHTML += `
-                    <div class="order-item">
-                        <p><strong>${item.name}</strong> x ${item.qty}</p>
-                        ${item.details ? `<small style="color:#777;">Note: ${item.details}</small>` : ""}
-                        <p class="price-pending">${displayPrice}</p>
-                    </div>
-                `;
-      });
-
-      document.getElementById("total").innerText = "Total: Rs." + total;
-    }
-
-    // 2. PLACE ORDER LOGIC
-    function placeOrder() {
-      let name = document.getElementById("name").value;
-      let house = document.getElementById("house").value;
-      let city = document.getElementById("city").value;
-      let state = document.getElementById("state").value;
-      let mobile = document.getElementById("mobile").value;
-      let country = document.getElementById("country").value;
-
-      if (!name || !house || !city || !state || !mobile) {
-        alert("Please fill all required fields!");
-        return;
-      }
-
-      // Generate Random ID (BK-XXXXX)
-      let randomID = "BK-" + Math.floor(10000 + Math.random() * 90000);
-      let total = cart.reduce((sum, i) => sum + (i.price || 0) * i.qty, 0);
-
-      let newOrder = {
-        id: randomID,
-        name: name,
-        email: user.email,
-        address: `${house}, ${city}, ${state}`,
-        mobile: country + mobile,
-        items: cart,
-        total: total,
-        status: "Pending",
-        date: new Date().toLocaleString(),
-        priceConfirmed: false
-      };
-
-      orders.push(newOrder);
-      localStorage.setItem("orders", JSON.stringify(orders));
-      localStorage.removeItem("cart");
-
-      // Show Success Popup
-      showPopup(randomID);
-    }
-
-    function showPopup(id) {
-      let content = document.getElementById("popupContent");
-      content.innerHTML = `
-                <h2 style="font-size:40px;">🎉</h2>
-                <h2>Order Placed!</h2>
-                <p>Your Order ID: <strong style="color:#ff5c7a;">${id}</strong></p>
-                <p style="font-size:13px; color:#666; margin: 10px 0;">Please keep this ID for tracking.</p>
-                <button class="btn" onclick="goHome()">Go Home</button>
-                <button class="btn btn-outline" onclick="goOrders()">My Orders</button>
-            `;
-      document.getElementById("overlay").style.display = "block";
-      document.getElementById("popup").style.display = "block";
-    }
-
-    function goHome() { window.location.href = "index.html"; }
-    function goOrders() { window.location.href = "myorders.html"; }
-
-    // Initialize
-    loadOrder();
-
-    // Phone number numbers-only restriction
-    document.getElementById("mobile").addEventListener("input", function () {
-      this.value = this.value.replace(/[^0-9]/g, '');
-    });
-  </script>
+  document.getElementById('mobile').addEventListener('input',function(){this.value=this.value.replace(/[^0-9\s]/g,'');});
+  loadSummary();
+</script>
 </body>
-
 </html>

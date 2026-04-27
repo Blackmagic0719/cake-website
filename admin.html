@@ -1,59 +1,548 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bakeit Admin Panel</title>
-    <link rel="stylesheet" href="style/admin/admin-style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-</head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel — Bakeit</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style/shared.css">
+  <style>
+    body{background:#f5f0f2;overflow-x:hidden;}
+    /* SIDEBAR */
+    .admin-sidebar{position:fixed;left:0;top:0;height:100vh;width:var(--sidebar-w);background:var(--dark);z-index:400;display:flex;flex-direction:column;transition:transform .3s;}
+    @media(max-width:900px){.admin-sidebar{transform:translateX(-100%);}.admin-sidebar.open{transform:translateX(0);}}
+    .sidebar-logo{padding:24px 22px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.07);}
+    .sidebar-logo img{height:32px;}
+    .sidebar-logo span{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:white;}
+    .sidebar-label{font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.25);padding:18px 22px 8px;}
+    .sidebar-item{display:flex;align-items:center;gap:12px;padding:12px 22px;font-size:14px;font-weight:400;color:rgba(255,255,255,.55);cursor:pointer;transition:all .2s;border-radius:0;text-decoration:none;border-left:3px solid transparent;}
+    .sidebar-item:hover{color:white;background:rgba(255,255,255,.05);border-left-color:rgba(232,85,109,.4);}
+    .sidebar-item.active{color:white;background:rgba(232,85,109,.12);border-left-color:var(--rose);}
+    .sidebar-item .si-icon{font-size:17px;width:22px;text-align:center;}
+    .sidebar-badge{margin-left:auto;background:var(--rose);color:white;font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;padding:0 5px;}
+    .sidebar-bottom{margin-top:auto;padding:20px 22px;border-top:1px solid rgba(255,255,255,.07);}
+    .sidebar-logout{display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,.4);cursor:pointer;transition:color .2s;}
+    .sidebar-logout:hover{color:white;}
 
+    /* MAIN CONTENT */
+    .admin-main{margin-left:var(--sidebar-w);min-height:100vh;padding:0;}
+    @media(max-width:900px){.admin-main{margin-left:0;}}
+
+    /* TOP BAR */
+    .admin-topbar{background:white;padding:0 36px;height:68px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-sm);position:sticky;top:0;z-index:300;}
+    .topbar-left{display:flex;align-items:center;gap:16px;}
+    .menu-toggle{display:none;background:none;border:none;font-size:22px;cursor:pointer;color:var(--dark);}
+    @media(max-width:900px){.menu-toggle{display:block;}}
+    .topbar-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--dark);}
+    .topbar-right{display:flex;align-items:center;gap:14px;}
+    .topbar-notif{position:relative;cursor:pointer;}
+    .notif-badge{position:absolute;top:-4px;right:-4px;background:var(--rose);color:white;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px;}
+    .topbar-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--rose);}
+    .topbar-name{font-size:14px;font-weight:500;color:var(--dark);}
+
+    /* SECTIONS */
+    .admin-section{display:none;padding:32px 36px;}
+    .admin-section.active{display:block;}
+    @media(max-width:640px){.admin-section{padding:20px 16px;}}
+
+    /* STATS GRID */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;margin-bottom:32px;}
+    .stat-card{background:white;border-radius:var(--radius-lg);padding:22px 24px;box-shadow:var(--shadow);display:flex;align-items:flex-start;gap:16px;}
+    .stat-icon{width:48px;height:48px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+    .stat-icon.rose{background:var(--rose-soft);}
+    .stat-icon.gold{background:var(--gold-pale);}
+    .stat-icon.green{background:#d1f2e1;}
+    .stat-icon.blue{background:#dbeafe;}
+    .stat-info{}
+    .stat-val{font-size:26px;font-weight:700;color:var(--dark);line-height:1.1;}
+    .stat-lbl{font-size:12px;color:var(--muted);margin-top:3px;}
+
+    /* ORDERS TABLE */
+    .orders-filters{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+    .filter-tab{padding:8px 18px;border:1.5px solid var(--border);border-radius:var(--radius-full);font-size:13px;font-weight:500;color:var(--mid);background:white;cursor:pointer;transition:all .2s;}
+    .filter-tab:hover{border-color:var(--rose);color:var(--rose);}
+    .filter-tab.active{background:var(--rose);border-color:var(--rose);color:white;}
+    .orders-table-wrap{background:white;border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden;}
+    .orders-table{width:100%;border-collapse:collapse;}
+    .orders-table th{background:var(--cream);font-size:11px;font-weight:600;color:var(--mid);letter-spacing:.1em;text-transform:uppercase;padding:14px 18px;text-align:left;border-bottom:1px solid var(--border);}
+    .orders-table td{padding:16px 18px;font-size:13px;color:var(--dark);border-bottom:1px solid var(--border);vertical-align:top;}
+    .orders-table tr:last-child td{border-bottom:none;}
+    .orders-table tr:hover td{background:#fdf7f9;}
+    .order-id-cell{font-weight:700;color:var(--rose);font-size:12px;letter-spacing:.06em;}
+    .order-customer{font-weight:500;}
+    .order-addr{font-size:12px;color:var(--muted);margin-top:2px;}
+    .order-items-preview{font-size:12px;color:var(--mid);}
+    /* action buttons in table */
+    .table-actions{display:flex;flex-direction:column;gap:6px;min-width:180px;}
+    .del-date-input{width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:12px;color:var(--dark);outline:none;transition:all .2s;background:white;}
+    .del-date-input:focus{border-color:var(--rose);}
+    .status-select{width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:12px;color:var(--dark);outline:none;background:white;cursor:pointer;}
+    .status-select:focus{border-color:var(--rose);}
+    .custom-price-row{display:flex;gap:6px;}
+    .custom-price-input{flex:1;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:12px;color:var(--dark);outline:none;}
+    .custom-price-input:focus{border-color:var(--rose);}
+    .save-row-btn{padding:7px 14px;background:var(--rose);color:white;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap;}
+    .save-row-btn:hover{background:var(--rose-deep);}
+    .del-btn-sm{padding:6px 12px;background:rgba(230,57,70,.1);color:var(--error);border:1px solid rgba(230,57,70,.2);border-radius:var(--radius-sm);font-size:12px;cursor:pointer;transition:all .2s;}
+    .del-btn-sm:hover{background:var(--error);color:white;}
+    .empty-table{text-align:center;padding:60px 20px;color:var(--muted);}
+    .empty-table div{font-size:40px;margin-bottom:12px;}
+    .search-bar{width:100%;padding:11px 16px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;background:white;transition:all .25s;margin-bottom:18px;}
+    .search-bar:focus{border-color:var(--rose);}
+
+    /* PRODUCTS */
+    .products-admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;}
+    .prod-admin-card{background:white;border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow);}
+    .prod-admin-img{height:160px;overflow:hidden;}
+    .prod-admin-img img{width:100%;height:100%;object-fit:cover;}
+    .prod-admin-body{padding:14px 16px;}
+    .prod-admin-name{font-size:14px;font-weight:600;color:var(--dark);margin-bottom:3px;}
+    .prod-admin-cat{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+    .prod-admin-price{font-size:15px;font-weight:700;color:var(--rose);margin-bottom:12px;}
+    .prod-admin-actions{display:flex;gap:8px;}
+    .add-product-form{background:white;border-radius:var(--radius-lg);padding:28px;box-shadow:var(--shadow);margin-bottom:28px;}
+    .add-product-form h2{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;margin-bottom:20px;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    @media(max-width:640px){.form-row{grid-template-columns:1fr;}}
+    .drop-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:32px 20px;text-align:center;cursor:pointer;transition:all .3s;background:var(--cream);}
+    .drop-zone:hover,.drop-zone.drag-over{border-color:var(--rose);background:var(--rose-pale);}
+    .drop-zone-icon{font-size:36px;margin-bottom:10px;}
+    .drop-zone-text{font-size:14px;color:var(--mid);}
+    .drop-zone-sub{font-size:12px;color:var(--muted);margin-top:4px;}
+    .image-preview{width:80px;height:80px;border-radius:var(--radius);object-fit:cover;display:none;margin:10px auto 0;border:2px solid var(--border);}
+
+    /* NOTIFICATIONS */
+    .notif-item{display:flex;align-items:flex-start;gap:14px;padding:16px 20px;border-bottom:1px solid var(--border);background:white;transition:background .2s;}
+    .notif-item:last-child{border-bottom:none;}
+    .notif-item.unread{background:var(--rose-pale);}
+    .notif-dot{width:8px;height:8px;border-radius:50%;background:var(--rose);flex-shrink:0;margin-top:5px;}
+    .notif-dot.read{background:var(--muted);}
+    .notif-msg{font-size:13px;color:var(--dark);}
+    .notif-time{font-size:11px;color:var(--muted);margin-top:3px;}
+
+    /* MOBILE overlay */
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(26,18,24,.5);z-index:399;}
+    .sidebar-overlay.show{display:block;}
+  </style>
+</head>
 <body>
 
-    <header
-        style="display:flex;justify-content:space-between;align-items:center;padding:15px;background:#ff5c7a;color:white;">
-        <span style="font-weight:600;">🍰 Bakeit Admin Dashboard</span>
-        <button onclick="goHome()"
-            style="background:white; color:#ff5c7a; padding:8px 15px; border-radius:20px; border:none; cursor:pointer; font-weight:500;">
-            Home
-        </button>
-    </header>
-
-    <div class="container">
-        <div class="card">
-            <h2>Add Product</h2>
-            <input type="text" id="name" placeholder="Product Name">
-            <input type="number" id="price" placeholder="Price">
-            <input type="text" id="category" placeholder="Category">
-
-            <div id="dropArea" class="drop-area">
-                Drag & Drop Image OR Click
-                <input type="file" id="fileInput" hidden>
-            </div>
-
-            <img id="preview" style="width:100px;margin-top:10px;display:none;">
-            <button onclick="addProduct()">Add Product</button>
-        </div>
-
-        <div class="card">
-            <h2>Products</h2>
-            <div id="productList"></div>
-        </div>
-
-        <div class="card">
-            <h2>Orders</h2>
-            <div id="orderList"></div>
-        </div>
-
-        <div class="card">
-            <h2>Notifications</h2>
-            <div id="notifyList"></div>
-            <button onclick="clearNotify()">Clear</button>
-        </div>
+<!-- SIDEBAR -->
+<aside class="admin-sidebar" id="adminSidebar">
+  <div class="sidebar-logo">
+    <img src="images/logo.png" alt="Bakeit">
+    <span>Bakeit</span>
+  </div>
+  <div class="sidebar-label">Main Menu</div>
+  <a class="sidebar-item active" data-section="dashboard" onclick="switchSection('dashboard')">
+    <span class="si-icon">📊</span> Dashboard
+  </a>
+  <a class="sidebar-item" data-section="orders" onclick="switchSection('orders')">
+    <span class="si-icon">📦</span> Orders
+    <span class="sidebar-badge" id="pendingBadge">0</span>
+  </a>
+  <a class="sidebar-item" data-section="products" onclick="switchSection('products')">
+    <span class="si-icon">🎂</span> Products
+  </a>
+  <div class="sidebar-label">System</div>
+  <a class="sidebar-item" data-section="notifications" onclick="switchSection('notifications')">
+    <span class="si-icon">🔔</span> Notifications
+    <span class="sidebar-badge" id="notifBadge" style="display:none;">0</span>
+  </a>
+  <div class="sidebar-bottom">
+    <div class="sidebar-logout" onclick="logout()">
+      <span>🚪</span> <span>Logout</span>
     </div>
+  </div>
+</aside>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-    <script src="scripts/admin/admin.js"></script>
+<!-- MAIN -->
+<div class="admin-main">
+  <!-- TOP BAR -->
+  <div class="admin-topbar">
+    <div class="topbar-left">
+      <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+      <h1 class="topbar-title" id="topbarTitle">Dashboard</h1>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-notif" onclick="switchSection('notifications')">
+        🔔
+        <div class="notif-badge" id="topNotifBadge" style="display:none;">0</div>
+      </div>
+      <span class="topbar-name">Admin</span>
+      <img class="topbar-avatar" src="images/logo.png" alt="Admin">
+    </div>
+  </div>
+
+  <!-- ── DASHBOARD ── -->
+  <div class="admin-section active" id="section-dashboard">
+    <div class="stats-grid" id="statsGrid"></div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;margin-bottom:16px;">Recent Orders</h3>
+    <div id="recentOrdersWrap"></div>
+  </div>
+
+  <!-- ── ORDERS ── -->
+  <div class="admin-section" id="section-orders">
+    <input class="search-bar" type="text" id="orderSearch" placeholder="🔍 Search by order ID, customer name or email..." oninput="renderOrders()">
+    <div class="orders-filters" id="orderFilters">
+      <div class="filter-tab active" data-status="All" onclick="setFilter('All')">All</div>
+      <div class="filter-tab" data-status="Pending" onclick="setFilter('Pending')">Pending</div>
+      <div class="filter-tab" data-status="Price Set" onclick="setFilter('Price Set')">Price Set</div>
+      <div class="filter-tab" data-status="Delivering" onclick="setFilter('Delivering')">Delivering</div>
+      <div class="filter-tab" data-status="Delivered" onclick="setFilter('Delivered')">Delivered</div>
+      <div class="filter-tab" data-status="Cancelled" onclick="setFilter('Cancelled')">Cancelled</div>
+    </div>
+    <div class="orders-table-wrap" id="ordersTableWrap"></div>
+  </div>
+
+  <!-- ── PRODUCTS ── -->
+  <div class="admin-section" id="section-products">
+    <div class="add-product-form">
+      <h2>Add New Product</h2>
+      <div class="form-row">
+        <div class="field"><label>Product Name</label><input type="text" id="prodName" placeholder="Chocolate Dream Cake"></div>
+        <div class="field"><label>Price (Rs.)</label><input type="number" id="prodPrice" placeholder="1500" min="0"></div>
+      </div>
+      <div class="field">
+        <label>Category</label>
+        <select id="prodCategory">
+          <option value="">Select category...</option>
+          <option value="chocolate">Chocolate</option>
+          <option value="fruit">Fruit</option>
+          <option value="birthday">Birthday</option>
+          <option value="celebration">Celebration</option>
+          <option value="cupcakes">Cupcakes</option>
+          <option value="bento">Bento & Combos</option>
+          <option value="jars">Cake Jars & Slices</option>
+          <option value="gift">Gift Boxes</option>
+          <option value="seasonal">Seasonal</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Product Image</label>
+        <div class="drop-zone" id="dropZone" onclick="document.getElementById('imgInput').click()">
+          <div class="drop-zone-icon">📸</div>
+          <div class="drop-zone-text">Click or drag & drop to upload</div>
+          <div class="drop-zone-sub">JPG, PNG or WebP — max 5MB</div>
+          <input type="file" id="imgInput" accept="image/*" hidden>
+        </div>
+        <img id="imgPreview" class="image-preview">
+      </div>
+      <button class="btn-primary" onclick="addProduct()">➕ Add Product</button>
+    </div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;margin-bottom:18px;">All Products (<span id="prodCount">0</span>)</h3>
+    <div class="products-admin-grid" id="productAdminGrid"></div>
+  </div>
+
+  <!-- ── NOTIFICATIONS ── -->
+  <div class="admin-section" id="section-notifications">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;">Notifications</h2>
+      <button class="btn-ghost btn-sm" onclick="clearAllNotifications()">Clear All</button>
+    </div>
+    <div class="orders-table-wrap" id="notifList"></div>
+  </div>
+</div>
+
+<script src="scripts/shared.js"></script>
+<script>
+// ── SECURITY ──
+const adminUser = requireAdmin();
+let currentFilter = 'All';
+let imgData = '';
+
+// ── SIDEBAR ──
+function switchSection(id) {
+  document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('section-'+id).classList.add('active');
+  document.querySelector(`[data-section="${id}"]`).classList.add('active');
+  document.getElementById('topbarTitle').textContent = {dashboard:'Dashboard',orders:'Orders',products:'Products',notifications:'Notifications'}[id];
+  closeSidebar();
+  if(id==='orders') renderOrders();
+  if(id==='products') renderProducts();
+  if(id==='notifications') renderNotifications();
+}
+function toggleSidebar(){ document.getElementById('adminSidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('show'); }
+function closeSidebar(){ document.getElementById('adminSidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('show'); }
+
+// ── DASHBOARD ──
+function renderDashboard() {
+  const orders = getOrders();
+  const products = JSON.parse(localStorage.getItem('products')) || [];
+  const pending = orders.filter(o => o.status === 'Pending').length;
+  const delivering = orders.filter(o => o.status === 'Delivering').length;
+  const delivered = orders.filter(o => o.status === 'Delivered').length;
+  const revenue = orders.filter(o=>o.status==='Delivered').reduce((s,o)=>s+(o.total||0),0);
+  const unread = getUnreadCount();
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card"><div class="stat-icon rose">📦</div><div class="stat-info"><div class="stat-val">${orders.length}</div><div class="stat-lbl">Total Orders</div></div></div>
+    <div class="stat-card"><div class="stat-icon gold">⏳</div><div class="stat-info"><div class="stat-val">${pending}</div><div class="stat-lbl">Pending Orders</div></div></div>
+    <div class="stat-card"><div class="stat-icon blue">🚚</div><div class="stat-info"><div class="stat-val">${delivering}</div><div class="stat-lbl">Out for Delivery</div></div></div>
+    <div class="stat-card"><div class="stat-icon green">✅</div><div class="stat-info"><div class="stat-val">${delivered}</div><div class="stat-lbl">Delivered</div></div></div>
+    <div class="stat-card"><div class="stat-icon green">💰</div><div class="stat-info"><div class="stat-val">${formatRs(revenue)}</div><div class="stat-lbl">Total Revenue</div></div></div>
+    <div class="stat-card"><div class="stat-icon rose">🎂</div><div class="stat-info"><div class="stat-val">${products.length}</div><div class="stat-lbl">Products Listed</div></div></div>`;
+
+  // pending badge
+  document.getElementById('pendingBadge').textContent = pending;
+  document.getElementById('pendingBadge').style.display = pending > 0 ? 'inline-flex' : 'none';
+  const nb = getUnreadCount();
+  document.getElementById('notifBadge').textContent = nb;
+  document.getElementById('notifBadge').style.display = nb > 0 ? 'inline-flex' : 'none';
+  document.getElementById('topNotifBadge').textContent = nb;
+  document.getElementById('topNotifBadge').style.display = nb > 0 ? 'flex' : 'none';
+
+  // Recent orders (last 5)
+  const recent = [...orders].reverse().slice(0, 5);
+  if(recent.length === 0) {
+    document.getElementById('recentOrdersWrap').innerHTML = '<div class="orders-table-wrap"><div class="empty-table"><div>📋</div><p>No orders yet</p></div></div>';
+    return;
+  }
+  document.getElementById('recentOrdersWrap').innerHTML = `
+    <div class="orders-table-wrap">
+      <table class="orders-table">
+        <thead><tr><th>Order ID</th><th>Customer</th><th>Total</th><th>Status</th><th>Placed</th></tr></thead>
+        <tbody>${recent.map(o=>`
+          <tr>
+            <td class="order-id-cell">${o.id}</td>
+            <td class="order-customer">${o.name}<div class="order-addr">${o.email}</div></td>
+            <td style="font-weight:600;">${formatRs(o.total)}</td>
+            <td>${statusBadge(o.status||'Pending')}</td>
+            <td style="font-size:12px;color:var(--muted);">${formatDate(o.placedAt)}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ── ORDERS ──
+function setFilter(status) {
+  currentFilter = status;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.toggle('active', t.dataset.status === status));
+  renderOrders();
+}
+
+function renderOrders() {
+  const wrap = document.getElementById('ordersTableWrap');
+  const search = (document.getElementById('orderSearch')?.value || '').toLowerCase();
+  let orders = getOrders().map((o, i) => ({ ...o, _idx: i }));
+  if (currentFilter !== 'All') orders = orders.filter(o => (o.status || 'Pending') === currentFilter);
+  if (search) orders = orders.filter(o =>
+    (o.id||'').toLowerCase().includes(search) ||
+    (o.name||'').toLowerCase().includes(search) ||
+    (o.email||'').toLowerCase().includes(search)
+  );
+  orders = orders.reverse();
+  if (orders.length === 0) {
+    wrap.innerHTML = '<div class="empty-table"><div>📋</div><p>No orders found</p></div>';
+    return;
+  }
+  wrap.innerHTML = `
+    <table class="orders-table">
+      <thead><tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>${orders.map(o => {
+        const hasCustom = o.items?.some(i => i.price === 0 || !i.price);
+        const itemsSummary = (o.items||[]).map(i=>`${i.name} ×${i.qty}`).join(', ');
+        return `<tr>
+          <td>
+            <div class="order-id-cell">${o.id}</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:3px;">${formatDate(o.placedAt)}</div>
+          </td>
+          <td>
+            <div class="order-customer">${o.name}</div>
+            <div class="order-addr">${o.email}</div>
+            <div class="order-addr">📞 ${o.mobile||'—'}</div>
+            <div class="order-addr">📍 ${o.address||'—'}</div>
+            ${o.notes?`<div class="order-addr">📝 ${o.notes}</div>`:''}
+          </td>
+          <td><div class="order-items-preview">${itemsSummary.substring(0,80)}${itemsSummary.length>80?'...':''}</div></td>
+          <td style="font-weight:700;color:var(--dark);">${formatRs(o.total)}</td>
+          <td>${statusBadge(o.status||'Pending')}</td>
+          <td>
+            <div class="table-actions">
+              <label style="font-size:11px;font-weight:600;color:var(--mid);letter-spacing:.08em;text-transform:uppercase;">📅 Delivery Date</label>
+              <input type="date" class="del-date-input" id="dd-${o._idx}" value="${o.deliveryDate||''}" min="${new Date().toISOString().split('T')[0]}">
+              <label style="font-size:11px;font-weight:600;color:var(--mid);letter-spacing:.08em;text-transform:uppercase;">Status</label>
+              <select class="status-select" id="st-${o._idx}">
+                <option value="Pending" ${(o.status||'Pending')==='Pending'?'selected':''}>⏳ Pending</option>
+                <option value="Price Set" ${o.status==='Price Set'?'selected':''}>💰 Price Set</option>
+                <option value="Delivering" ${o.status==='Delivering'?'selected':''}>🚚 Delivering</option>
+                <option value="Delivered" ${o.status==='Delivered'?'selected':''}>✅ Delivered</option>
+                <option value="Cancelled" ${o.status==='Cancelled'?'selected':''}>❌ Cancelled</option>
+              </select>
+              ${hasCustom?`
+              <label style="font-size:11px;font-weight:600;color:var(--mid);letter-spacing:.08em;text-transform:uppercase;">💰 Custom Price</label>
+              <div class="custom-price-row">
+                <input type="number" class="custom-price-input" id="cp-${o._idx}" placeholder="Set price (Rs.)">
+                <button class="save-row-btn" onclick="setCustomPrice(${o._idx})">Set</button>
+              </div>`:''}
+              <button class="save-row-btn" style="background:var(--dark);" onclick="saveOrderChanges(${o._idx})">💾 Save Changes</button>
+              <button class="del-btn-sm" onclick="deleteOrder(${o._idx})">🗑️ Delete</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('')}
+      </tbody>
+    </table>`;
+}
+
+function saveOrderChanges(idx) {
+  const orders = getOrders();
+  const deliveryDate = document.getElementById(`dd-${idx}`)?.value || null;
+  const status = document.getElementById(`st-${idx}`)?.value || 'Pending';
+  orders[idx].deliveryDate = deliveryDate || null;
+  orders[idx].status = status;
+  saveOrders(orders);
+  if (deliveryDate) addNotification(`Delivery date for order ${orders[idx].id} set to ${formatDate(deliveryDate)}`,'info');
+  showToast('Order updated successfully!','success');
+  renderDashboard();
+  renderOrders();
+}
+
+function setCustomPrice(idx) {
+  const orders = getOrders();
+  const price = parseInt(document.getElementById(`cp-${idx}`)?.value);
+  if (!price || price < 0) { showToast('Please enter a valid price.','error'); return; }
+  let updated = false;
+  orders[idx].items.forEach(item => {
+    if (item.price === 0 || !item.price) { item.price = price; updated = true; }
+  });
+  if (updated) {
+    orders[idx].total = orders[idx].items.reduce((s,i)=>s+(i.price||0)*i.qty,0);
+    orders[idx].status = 'Price Set';
+    saveOrders(orders);
+    addNotification(`Custom cake price Rs.${price.toLocaleString()} set for order ${orders[idx].id}`,'info');
+    showToast('Custom price set and customer notified.','success');
+    renderOrders();
+  }
+}
+
+function deleteOrder(idx) {
+  if (!confirm('Delete this order permanently?')) return;
+  const orders = getOrders();
+  orders.splice(idx, 1);
+  saveOrders(orders);
+  showToast('Order deleted.','default');
+  renderDashboard();
+  renderOrders();
+}
+
+// ── PRODUCTS ──
+let prodImgData = '';
+
+function initDropZone() {
+  const dz = document.getElementById('dropZone');
+  const fi = document.getElementById('imgInput');
+  if (!dz) return;
+  dz.ondragover = e => { e.preventDefault(); dz.classList.add('drag-over'); };
+  dz.ondragleave = () => dz.classList.remove('drag-over');
+  dz.ondrop = e => { e.preventDefault(); dz.classList.remove('drag-over'); handleImg(e.dataTransfer.files[0]); };
+  fi.onchange = e => handleImg(e.target.files[0]);
+}
+function handleImg(file) {
+  if (!file || !file.type.startsWith('image/')) { showToast('Please upload a valid image.','error'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    prodImgData = e.target.result;
+    const prev = document.getElementById('imgPreview');
+    prev.src = prodImgData; prev.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+function addProduct() {
+  const name = document.getElementById('prodName').value.trim();
+  const price = parseInt(document.getElementById('prodPrice').value);
+  const category = document.getElementById('prodCategory').value;
+  if (!name || !price || !category || !prodImgData) { showToast('Please fill all fields and upload an image.','error'); return; }
+  const products = JSON.parse(localStorage.getItem('products')) || [];
+  products.push({ name, price, category, image: prodImgData, addedAt: new Date().toISOString() });
+  localStorage.setItem('products', JSON.stringify(products));
+  document.getElementById('prodName').value = '';
+  document.getElementById('prodPrice').value = '';
+  document.getElementById('prodCategory').value = '';
+  document.getElementById('imgPreview').style.display = 'none';
+  document.getElementById('imgInput').value = '';
+  prodImgData = '';
+  showToast(`"${name}" added successfully!`,'success');
+  renderProducts();
+}
+function renderProducts() {
+  const products = JSON.parse(localStorage.getItem('products')) || [];
+  document.getElementById('prodCount').textContent = products.length;
+  const grid = document.getElementById('productAdminGrid');
+  if (products.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--muted);font-size:15px;">No products yet. Add your first cake above!</div>';
+    return;
+  }
+  grid.innerHTML = products.map((p, i) => `
+    <div class="prod-admin-card">
+      <div class="prod-admin-img"><img src="${p.image}" alt="${p.name}" loading="lazy"></div>
+      <div class="prod-admin-body">
+        <div class="prod-admin-name">${p.name}</div>
+        <div class="prod-admin-cat">${p.category}</div>
+        <div class="prod-admin-price">${formatRs(p.price)}</div>
+        <div class="prod-admin-actions">
+          <button class="btn-ghost btn-sm" style="flex:1;" onclick="editPrice(${i})">Edit Price</button>
+          <button class="del-btn-sm" onclick="deleteProduct(${i})">🗑️</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function editPrice(i) {
+  const products = JSON.parse(localStorage.getItem('products')) || [];
+  const np = prompt(`New price for "${products[i].name}" (Rs.):`, products[i].price);
+  if (np === null) return;
+  if (isNaN(parseInt(np)) || parseInt(np) < 0) { showToast('Please enter a valid price.','error'); return; }
+  products[i].price = parseInt(np);
+  localStorage.setItem('products', JSON.stringify(products));
+  showToast('Price updated!','success');
+  renderProducts();
+}
+function deleteProduct(i) {
+  const products = JSON.parse(localStorage.getItem('products')) || [];
+  if (!confirm(`Delete "${products[i].name}"?`)) return;
+  products.splice(i, 1);
+  localStorage.setItem('products', JSON.stringify(products));
+  showToast('Product deleted.','default');
+  renderProducts();
+}
+
+// ── NOTIFICATIONS ──
+function renderNotifications() {
+  const notifs = getNotifications();
+  const list = document.getElementById('notifList');
+  if (notifs.length === 0) {
+    list.innerHTML = '<div class="empty-table"><div>🔔</div><p>No notifications yet</p></div>';
+    return;
+  }
+  list.innerHTML = notifs.map(n => `
+    <div class="notif-item ${n.read ? '' : 'unread'}">
+      <div class="notif-dot ${n.read ? 'read' : ''}"></div>
+      <div>
+        <div class="notif-msg">${n.msg}</div>
+        <div class="notif-time">${formatDateTime(n.time)}</div>
+      </div>
+    </div>`).join('');
+  // Mark all read
+  const n = getNotifications().map(x => ({ ...x, read: true }));
+  localStorage.setItem('notifications', JSON.stringify(n));
+  document.getElementById('notifBadge').style.display = 'none';
+  document.getElementById('topNotifBadge').style.display = 'none';
+}
+function clearAllNotifications() {
+  localStorage.removeItem('notifications');
+  renderNotifications();
+  renderDashboard();
+  showToast('Notifications cleared.','default');
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+  renderDashboard();
+  renderProducts();
+  initDropZone();
+});
+</script>
 </body>
-
 </html>

@@ -1,231 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile - Bakeit</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <script src="scripts/firebase-config.js"></script>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile — Bakeit</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style/shared.css">
+  <script src="scripts/firebase-config.js"></script>
+  <style>
+    body{min-height:100vh;background:url('images/bg.png') center/cover;animation:bgKen 20s ease-in-out infinite alternate;}
+    @keyframes bgKen{from{background-position:center top;}to{background-position:center bottom;}}
+    .page-body{padding-top:var(--nav-h);min-height:100vh;display:flex;align-items:center;justify-content:center;padding-bottom:40px;}
+    .profile-card{background:rgba(255,255,255,.94);backdrop-filter:blur(20px);border-radius:var(--radius-xl);padding:40px;width:90%;max-width:420px;box-shadow:var(--shadow-xl);text-align:center;}
+    .avatar-wrap{position:relative;display:inline-block;margin-bottom:20px;}
+    .avatar{width:100px;height:100px;border-radius:50%;object-fit:cover;border:4px solid var(--rose);box-shadow:0 6px 20px rgba(232,85,109,.3);}
+    .avatar-edit{position:absolute;bottom:2px;right:2px;width:28px;height:28px;background:var(--rose);border-radius:50%;border:2px solid white;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;transition:all .2s;}
+    .avatar-edit:hover{background:var(--rose-deep);}
+    .profile-name{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--dark);margin-bottom:4px;}
+    .profile-email{font-size:14px;color:var(--mid);margin-bottom:20px;}
+    .info-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--cream);border-radius:var(--radius);margin-bottom:10px;text-align:left;}
+    .info-row .icon{font-size:18px;}
+    .info-row .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;}
+    .info-row .value{font-size:14px;font-weight:500;color:var(--dark);}
+    .divider{height:1px;background:var(--border);margin:20px 0;}
+    .actions{display:flex;flex-direction:column;gap:10px;}
+    .file-name{font-size:12px;color:var(--muted);margin-top:6px;min-height:16px;}
+  </style>
 </head>
-
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: 'Poppins', sans-serif;
-    }
-
-    body {
-        background: url('images/bg.png') no-repeat center/cover;
-        animation: moveBg 20s infinite alternate ease-in-out;
-    }
-
-    @keyframes moveBg {
-        0% {
-            background-position: center top;
-        }
-
-        100% {
-            background-position: center bottom;
-        }
-    }
-
-    /* HEADER */
-    header {
-        background: white;
-        padding: 15px 40px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .logo {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .logo img {
-        height: 40px;
-    }
-
-    .logo span {
-        font-size: 24px;
-        color: #ff5c7a;
-        font-weight: 600;
-    }
-
-    /* CONTAINER */
-    .container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 85vh;
-    }
-
-    /* PROFILE CARD */
-    .profile-box {
-        background: white;
-        padding: 30px;
-        border-radius: 20px;
-        width: 360px;
-        text-align: center;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-    }
-
-    /* IMAGE FIX */
-    .profile-img {
-        width: 110px;
-        height: 110px;
-        border-radius: 50%;
-        object-fit: cover;
-        margin-bottom: 15px;
-        border: 4px solid #ff5c7a;
-        background: #fff;
-    }
-
-    /* INPUT */
-    input {
-        margin-top: 10px;
-    }
-
-    /* INFO */
-    .info {
-        margin: 8px 0;
-        color: #555;
-    }
-
-    /* BUTTONS */
-    .btn {
-        width: 100%;
-        padding: 12px;
-        margin-top: 10px;
-        border: none;
-        border-radius: 25px;
-        cursor: pointer;
-        font-weight: 600;
-    }
-
-    .choose-btn {
-        background: #ff5c7a;
-        color: white;
-    }
-
-    .logout-btn {
-        background: #eee;
-    }
-
-    .save-btn {
-        background: #222;
-        color: white;
-    }
-</style>
-</head>
-
 <body>
-
-    <header>
-        <div class="logo">
-            <a href="index.html"><img src="images/logo.png"></a>
-            <span>Bakeit</span>
-        </div>
-    </header>
-
-    <div class="container">
-
-        <div class="profile-box">
-
-            <!-- IMAGE -->
-            <img id="profileImg" class="profile-img" src="images/user.png">
-
-            <h2 id="name"></h2>
-            <p class="info" id="email"></p>
-            <p class="info" id="mobile"></p>
-
-            <!-- FILE INPUT -->
-            <input type="file" id="fileInput" style="display:none;">
-
-            <input type="file" id="fileInput" style="display:none;" onchange="showFileName()">
-
-            <button class="btn choose-btn" onclick="document.getElementById('fileInput').click()">
-                📸 Upload Profile Image
-            </button>
-
-            <p id="fileName"></p>
-
-
-            <!-- SAVE BUTTON -->
-            <button class="btn save-btn" onclick="saveImage()">Save Image</button>
-
-            <button class="btn logout-btn" onclick="logout()">Logout</button>
-
-        </div>
-
+<nav class="nav" id="navbar" style="background:rgba(253,248,240,.95);">
+  <a class="nav-logo" href="index.html"><img src="images/logo.png"><span class="nav-brand">Bakeit</span></a>
+  <div class="nav-right">
+    <button class="btn-ghost btn-sm" onclick="location.href='myorders.html'">My Orders</button>
+    <button class="btn-ghost btn-sm" onclick="logout()">Logout</button>
+  </div>
+</nav>
+<div class="page-body">
+  <div class="profile-card">
+    <div class="avatar-wrap">
+      <img id="avatarImg" class="avatar" src="images/user.png" alt="Profile">
+      <div class="avatar-edit" onclick="document.getElementById('fileInput').click()">✏️</div>
     </div>
+    <div class="profile-name" id="pName">—</div>
+    <div class="profile-email" id="pEmail">—</div>
 
-    <script>
-        // GET USER
-        let user = JSON.parse(localStorage.getItem("user"));
+    <div class="info-row"><div class="icon">📞</div><div><div class="label">Mobile</div><div class="value" id="pMobile">—</div></div></div>
 
-        // PROTECT
-        if (!user) {
-            alert("Please login first!");
-            window.location.href = "login.html";
-        }
+    <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="previewImage(this)">
+    <div class="file-name" id="fileName"></div>
 
-        // SHOW DATA
-        document.getElementById("name").innerText = user.first + " " + user.last;
-        document.getElementById("email").innerText = user.email;
-        document.getElementById("mobile").innerText = user.mobile;
+    <div class="divider"></div>
+    <div class="actions">
+      <button class="btn-primary btn-full" onclick="saveImage()">💾 Save Profile Image</button>
+      <button class="btn-ghost btn-full" onclick="location.href='myorders.html'">📦 My Orders</button>
+      <button class="btn-ghost btn-full" onclick="logout()">🚪 Logout</button>
+    </div>
+  </div>
+</div>
+<script src="scripts/shared.js"></script>
+<script>
+  const user=requireAuth();
+  document.getElementById('pName').textContent=(user.first||'')+' '+(user.last||'');
+  document.getElementById('pEmail').textContent=user.email||'—';
+  document.getElementById('pMobile').textContent=user.mobile||'—';
+  if(user.image)document.getElementById('avatarImg').src=user.image;
 
-        // DEFAULT IMAGE
-        if (user.image) {
-            document.getElementById("profileImg").src = user.image;
-        } else {
-            document.getElementById("profileImg").src = "images/user.png";
-        }
-
-        // SAVE IMAGE BUTTON
-        function saveImage() {
-
-            let file = document.getElementById("fileInput").files[0];
-
-            if (!file) {
-                alert("Please choose an image first!");
-                return;
-            }
-
-            let reader = new FileReader();
-
-            reader.onload = function (e) {
-                user.image = e.target.result;
-                localStorage.setItem("user", JSON.stringify(user));
-
-                document.getElementById("profileImg").src = user.image;
-
-                alert("Profile image updated!");
-            };
-
-            reader.readAsDataURL(file);
-        }
-
-        // NAVIGATION
-        function logout() {
-            localStorage.removeItem("user");
-            window.location.href = "login.html";
-        }
-    </script>
-    <script>function showFileName() {
-            let file = document.getElementById("fileInput").files[0];
-
-            if (file) {
-                document.getElementById("fileName").innerText = file.name;
-            }
-        }</script>
-
+  function previewImage(input){
+    const file=input.files[0];
+    if(!file)return;
+    document.getElementById('fileName').textContent=file.name;
+    const reader=new FileReader();
+    reader.onload=e=>document.getElementById('avatarImg').src=e.target.result;
+    reader.readAsDataURL(file);
+  }
+  function saveImage(){
+    const file=document.getElementById('fileInput').files[0];
+    if(!file){showToast('Please choose an image first.','error');return;}
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const u=getUser();
+      u.image=e.target.result;
+      localStorage.setItem('user',JSON.stringify(u));
+      // update in users list too
+      const users=JSON.parse(localStorage.getItem('users'))||[];
+      const idx=users.findIndex(x=>x.email===u.email);
+      if(idx>-1){users[idx]=u;localStorage.setItem('users',JSON.stringify(users));}
+      showToast('Profile image updated!','success');
+    };
+    reader.readAsDataURL(file);
+  }
+</script>
 </body>
-
 </html>

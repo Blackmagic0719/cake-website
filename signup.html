@@ -1,276 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - Bakeit</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <script src="scripts/firebase-config.js"></script>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up — Bakeit</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style/shared.css">
+  <script src="scripts/firebase-config.js"></script>
+  <style>
+    body{min-height:100vh;display:flex;}
+    .left{flex:1;position:relative;overflow:hidden;display:none;}
+    @media(min-width:860px){.left{display:block;}}
+    .left-bg{position:absolute;inset:0;background:url('images/bg.png') center/cover;animation:bgKen 22s ease-in-out infinite alternate;}
+    @keyframes bgKen{from{background-position:center top;}to{background-position:center bottom;}}
+    .left-ov{position:absolute;inset:0;background:linear-gradient(155deg,rgba(26,18,24,.82),rgba(26,18,24,.5));}
+    .left-body{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:space-between;padding:48px;}
+    .brand-link{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .brand-link img{height:34px;}.brand-link span{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:white;}
+    .left-tag h2{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,4vw,48px);font-weight:300;color:white;line-height:1.2;margin-bottom:14px;}
+    .left-tag h2 em{font-style:italic;color:#f5d5dc;}
+    .left-tag p{font-size:14px;color:rgba(255,255,255,.58);line-height:1.7;}
+    .left-bot{font-size:12px;color:rgba(255,255,255,.25);}
+    .right{width:100%;max-width:560px;flex-shrink:0;background:var(--cream);display:flex;align-items:flex-start;justify-content:center;padding:48px 40px;overflow-y:auto;}
+    @media(max-width:860px){.right{max-width:100%;}}
+    .fw{width:100%;max-width:420px;padding:20px 0;}
+    .mob-logo{display:flex;align-items:center;gap:10px;margin-bottom:32px;text-decoration:none;}
+    @media(min-width:860px){.mob-logo{display:none;}}
+    .mob-logo img{height:32px;}.mob-logo span{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--rose);}
+    .fw h1{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:400;color:var(--dark);margin-bottom:6px;}
+    .fw>.sub{font-size:14px;color:var(--mid);margin-bottom:28px;}
+    .row{display:flex;gap:14px;}
+    .row .field{flex:1;}
+    .err{background:var(--rose-soft);border:1px solid rgba(232,85,109,.2);border-radius:var(--radius);padding:11px 15px;font-size:13px;color:var(--rose-deep);margin-bottom:18px;display:none;align-items:center;gap:8px;}
+    .err.show{display:flex;animation:shake .4s ease;}
+    @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+    .strength-bar{height:3px;border-radius:10px;background:#eee;margin-top:7px;overflow:hidden;}
+    .strength-fill{height:100%;border-radius:10px;width:0%;transition:all .4s;}
+    .submit-btn{width:100%;padding:14px;background:var(--rose);color:white;border:none;border-radius:var(--radius-full);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all .3s;margin-top:6px;}
+    .submit-btn:hover{background:var(--rose-deep);transform:translateY(-1px);box-shadow:0 8px 24px rgba(232,85,109,.4);}
+    .form-foot{margin-top:22px;text-align:center;font-size:14px;color:var(--mid);}
+    .form-foot a{color:var(--rose);text-decoration:none;font-weight:500;}
+    /* OTP modal */
+    .otp-overlay{display:none;position:fixed;inset:0;background:rgba(26,18,24,.65);backdrop-filter:blur(6px);z-index:800;align-items:center;justify-content:center;}
+    .otp-overlay.active{display:flex;}
+    .otp-card{background:white;border-radius:var(--radius-xl);padding:48px 40px;width:90%;max-width:400px;text-align:center;box-shadow:var(--shadow-xl);animation:modalIn .35s cubic-bezier(.34,1.56,.64,1);}
+    @keyframes modalIn{from{opacity:0;transform:scale(.88) translateY(20px);}to{opacity:1;transform:scale(1) translateY(0);}}
+    .otp-card h2{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;margin:14px 0 10px;}
+    .otp-card p{font-size:13px;color:var(--mid);margin-bottom:20px;line-height:1.6;}
+    .otp-input{width:100%;padding:16px;text-align:center;font-size:28px;font-weight:700;letter-spacing:.35em;color:var(--dark);border:1.5px solid var(--border);border-radius:var(--radius);outline:none;transition:all .25s;background:var(--rose-pale);}
+    .otp-input:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(232,85,109,.1);}
+  </style>
 </head>
-
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: 'Poppins', sans-serif;
-    }
-
-    body {
-        height: 100vh;
-        background: url('images/bg.png') no-repeat center/cover;
-        animation: moveBg 20s infinite alternate ease-in-out;
-        display: flex;
-        flex-direction: column;
-    }
-
-    @keyframes moveBg {
-        0% {
-            background-position: center top;
-        }
-
-        100% {
-            background-position: center bottom;
-        }
-    }
-
-    header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 15px 40px;
-        background: rgba(255, 255, 255, 0.8);
-        backdrop-filter: blur(10px);
-    }
-
-    .logo {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .logo img {
-        height: 40px;
-    }
-
-    .logo span {
-        font-weight: 700;
-        color: #ff5c7a;
-    }
-
-    .container {
-        flex: 1;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .box {
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(15px);
-        padding: 35px;
-        border-radius: 20px;
-        width: 380px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        text-align: center;
-    }
-
-    .input-row {
-        display: flex;
-        gap: 10px;
-    }
-
-    input {
-        width: 100%;
-        padding: 14px;
-        margin: 10px 0;
-        border-radius: 10px;
-        border: 1px solid #ddd;
-        outline: none;
-    }
-
-    input:focus {
-        border-color: #ff5c7a;
-    }
-
-    button {
-        width: 100%;
-        padding: 14px;
-        background: #ff5c7a;
-        color: white;
-        border: none;
-        border-radius: 30px;
-        cursor: pointer;
-        font-weight: 600;
-        margin-top: 10px;
-        transition: 0.3s;
-    }
-
-    button:hover {
-        background: #e14a68;
-    }
-
-    a {
-        display: block;
-        margin-top: 15px;
-        color: #ff5c7a;
-        text-decoration: none;
-        font-size: 14px;
-    }
-
-    footer {
-        text-align: center;
-        padding: 10px;
-        background: rgba(255, 255, 255, 0.8);
-        font-size: 12px;
-    }
-
-    /* OTP Modal Styling */
-    .modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.6);
-        z-index: 1000;
-    }
-
-    .modal-content {
-        background: white;
-        width: 320px;
-        margin: 100px auto;
-        padding: 30px;
-        border-radius: 15px;
-        text-align: center;
-    }
-</style>
-</head>
-
 <body>
-
-    <header>
-        <div class="logo">
-            <a href="index.html"><img src="images/logo.png"></a>
-            <span>Bakeit</span>
-        </div>
-    </header>
-
-    <div class="container">
-        <div class="box">
-            <h2>Create Account</h2>
-
-            <div class="input-row">
-                <input type="text" id="first" placeholder="First Name">
-                <input type="text" id="last" placeholder="Last Name">
-            </div>
-
-            <input type="email" id="email" placeholder="Email">
-            <input type="text" id="mobile" placeholder="Mobile Number" maxlength="10">
-            <input type="password" id="pass" placeholder="Password (Min 6 chars)" maxlength="15">
-            <input type="password" id="confirm" placeholder="Confirm Password">
-
-            <button onclick="startSignup()">Sign Up</button>
-            <a href="login.html">Already have an account? Login</a>
-        </div>
+<div class="left">
+  <div class="left-bg"></div><div class="left-ov"></div>
+  <div class="left-body">
+    <a class="brand-link" href="index.html"><img src="images/logo.png"><span>Bakeit</span></a>
+    <div class="left-tag">
+      <h2>Join the<br><em>Bakeit Family</em></h2>
+      <p>Create an account and start ordering cakes crafted just for you.</p>
     </div>
-
-    <div id="otpModal" class="modal">
-        <div class="modal-content">
-            <h3>Verify Email</h3>
-            <p style="font-size: 13px; color: #666; margin: 10px 0;">We've "sent" a 6-digit code to your email.</p>
-            <input type="text" id="otpInput" placeholder="Enter 6-digit OTP" maxlength="6"
-                style="text-align: center; font-size: 20px; letter-spacing: 5px;">
-            <button onclick="verifyOTP()">Verify & Create Account</button>
-            <button onclick="closeModal()" style="background:none; color:#999; font-size:12px;">Cancel</button>
-        </div>
+    <div class="left-bot">© 2026 Bakeit Cake Shop</div>
+  </div>
+</div>
+<div class="right">
+  <div class="fw">
+    <a class="mob-logo" href="index.html"><img src="images/logo.png"><span>Bakeit</span></a>
+    <h1>Create Account</h1>
+    <p class="sub">Let's get started — it only takes a minute 🎂</p>
+    <div class="err" id="err"><span>❌</span><span id="errTxt"></span></div>
+    <div class="row">
+      <div class="field"><label>First Name</label><input type="text" id="first" placeholder="Nadeesha"></div>
+      <div class="field"><label>Last Name</label><input type="text" id="last" placeholder="Perera"></div>
     </div>
+    <div class="field"><label>Email Address</label><input type="email" id="email" placeholder="you@example.com"></div>
+    <div class="field"><label>Mobile Number</label><input type="text" id="mobile" placeholder="07XXXXXXXX" maxlength="10"></div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="pass" placeholder="Min 6 chars, 1 uppercase, 1 number" maxlength="20" oninput="checkStrength(this.value)">
+      <div class="strength-bar"><div class="strength-fill" id="sBar"></div></div>
+    </div>
+    <div class="field"><label>Confirm Password</label><input type="password" id="confirm" placeholder="••••••••" onkeydown="if(event.key==='Enter')startSignup()"></div>
+    <button class="submit-btn" onclick="startSignup()">Create Account</button>
+    <div class="form-foot">Already have an account? <a href="login.html">Sign in</a></div>
+  </div>
+</div>
 
-    <script>
-        let generatedOTP = null;
-        let tempUserData = null;
+<!-- OTP Modal -->
+<div class="otp-overlay" id="otpOverlay">
+  <div class="otp-card">
+    <div style="font-size:46px;">📧</div>
+    <h2>Verify Email</h2>
+    <p>We've sent a 6-digit code to<br><strong id="otpEmail"></strong></p>
+    <input type="text" class="otp-input" id="otpInput" placeholder="000000" maxlength="6">
+    <button class="submit-btn" style="margin-top:16px;" onclick="verifyOTP()">Verify & Create Account</button>
+    <button style="background:none;border:none;color:var(--mid);font-size:13px;margin-top:12px;cursor:pointer;display:block;width:100%;" onclick="closeOTP()">Cancel</button>
+  </div>
+</div>
 
-        function startSignup() {
-            let first = document.getElementById("first").value.trim();
-            let last = document.getElementById("last").value.trim();
-            let email = document.getElementById("email").value.trim();
-            let mobile = document.getElementById("mobile").value.trim();
-            let pass = document.getElementById("pass").value;
-            let confirm = document.getElementById("confirm").value;
+<script src="scripts/shared.js"></script>
+<script>
+  if(getUser()) location.href='index.html';
+  let otp=null, tempUser=null;
 
-            // 1. Validations
-            if (!first || !last || !email || !mobile || !pass) {
-                alert("Please fill all fields!");
-                return;
-            }
-
-            if (!email.includes("@") || !email.includes(".")) {
-                alert("Invalid email format!");
-                return;
-            }
-
-            if (mobile.length !== 10 || isNaN(mobile)) {
-                alert("Mobile number must be 10 digits!");
-                return;
-            }
-
-            if (pass.length < 6 || !/[A-Z]/.test(pass) || !/[0-9]/.test(pass)) {
-                alert("Password must be 6+ chars, include 1 Uppercase and 1 Number!");
-                return;
-            }
-
-            if (pass !== confirm) {
-                alert("Passwords do not match!");
-                return;
-            }
-
-            // 2. Check Duplicate
-            let users = JSON.parse(localStorage.getItem("users")) || [];
-            if (users.find(u => u.email === email)) {
-                alert("Email already registered!");
-                return;
-            }
-
-            // 3. Store temporary data and trigger OTP
-            tempUserData = { first, last, email, mobile, pass, image: "", isVerified: false };
-            generatedOTP = Math.floor(100000 + Math.random() * 900000);
-
-            // Simulation Alert
-            alert("📧 EMAIL SIMULATION\nTo: " + email + "\nYour Bakeit Verification Code is: " + generatedOTP);
-
-            document.getElementById("otpModal").style.display = "block";
-        }
-
-        function verifyOTP() {
-            let userEntered = document.getElementById("otpInput").value;
-
-            if (userEntered == generatedOTP) {
-                let users = JSON.parse(localStorage.getItem("users")) || [];
-                tempUserData.isVerified = true;
-                users.push(tempUserData);
-                localStorage.setItem("users", JSON.stringify(users));
-
-                alert("Verification Successful 🎉");
-                window.location.href = "login.html";
-            } else {
-                alert("❌ Invalid OTP. Please try again.");
-            }
-        }
-
-        function closeModal() {
-            document.getElementById("otpModal").style.display = "none";
-            generatedOTP = null;
-            tempUserData = null;
-        }
-    </script>
-
-    <footer>
-        © 2026 Bakeit Cake Shop
-    </footer>
-
+  function checkStrength(v){
+    const bar=document.getElementById('sBar');
+    let s=0;
+    if(v.length>=6)s++; if(/[A-Z]/.test(v))s++; if(/[0-9]/.test(v))s++; if(/[^a-zA-Z0-9]/.test(v))s++;
+    const w=['0%','25%','50%','75%','100%'];
+    const c=['','#e8556d','#f4a261','#2a9d8f','#4caf7d'];
+    bar.style.width=w[s]; bar.style.background=c[s]||'#eee';
+  }
+  function showErr(msg){
+    document.getElementById('errTxt').textContent=msg;
+    const e=document.getElementById('err'); e.classList.remove('show'); void e.offsetWidth; e.classList.add('show');
+  }
+  function startSignup(){
+    const first=document.getElementById('first').value.trim();
+    const last=document.getElementById('last').value.trim();
+    const email=document.getElementById('email').value.trim().toLowerCase();
+    const mobile=document.getElementById('mobile').value.trim();
+    const pass=document.getElementById('pass').value;
+    const confirm=document.getElementById('confirm').value;
+    if(!first||!last) return showErr('Please enter your full name.');
+    if(!email||!email.includes('@')) return showErr('Please enter a valid email address.');
+    if(!/^\d{10}$/.test(mobile)) return showErr('Mobile must be exactly 10 digits.');
+    if(pass.length<6) return showErr('Password must be at least 6 characters.');
+    if(!/[A-Z]/.test(pass)) return showErr('Password must include at least 1 uppercase letter.');
+    if(!/[0-9]/.test(pass)) return showErr('Password must include at least 1 number.');
+    if(pass!==confirm) return showErr('Passwords do not match.');
+    const users=JSON.parse(localStorage.getItem('users'))||[];
+    if(users.find(u=>u.email===email)) return showErr('This email is already registered.');
+    tempUser={first,last,email,mobile,pass,image:'',role:'customer'};
+    otp=Math.floor(100000+Math.random()*900000);
+    alert(`📧 EMAIL SIMULATION\nTo: ${email}\nYour Bakeit OTP: ${otp}\n\n(In production, this would be sent via email)`);
+    document.getElementById('otpEmail').textContent=email;
+    document.getElementById('otpOverlay').classList.add('active');
+  }
+  function verifyOTP(){
+    const entered=document.getElementById('otpInput').value;
+    if(String(entered)===String(otp)){
+      const users=JSON.parse(localStorage.getItem('users'))||[];
+      users.push(tempUser);
+      localStorage.setItem('users',JSON.stringify(users));
+      showToast('Account created successfully! Please log in.','success');
+      setTimeout(()=>location.href='login.html',1500);
+    } else {
+      document.getElementById('otpInput').style.borderColor='var(--rose)';
+      showToast('Invalid OTP. Please try again.','error');
+    }
+  }
+  function closeOTP(){ document.getElementById('otpOverlay').classList.remove('active'); otp=null; tempUser=null; }
+</script>
 </body>
-
 </html>
